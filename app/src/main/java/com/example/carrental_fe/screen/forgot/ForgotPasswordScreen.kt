@@ -24,10 +24,17 @@ import com.example.carrental_fe.R
 import com.example.carrental_fe.screen.component.BackButton
 import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.component.InputField
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun ForgotPasswordScreen(verifyClick: () -> Unit)
+fun ForgotPasswordScreen(
+    forgotPasswordViewModel : ForgotPasswordViewModel,
+    backClick: () ->Unit
+)
 {
+    val value by forgotPasswordViewModel.email.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -44,7 +51,7 @@ fun ForgotPasswordScreen(verifyClick: () -> Unit)
         ){
             Spacer(modifier = Modifier.height(50.dp))
 
-            BackButton(onClick = {}, iconResId = R.drawable.back_icon)
+            BackButton(onClick = backClick, iconResId = R.drawable.back_icon)
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -67,10 +74,10 @@ fun ForgotPasswordScreen(verifyClick: () -> Unit)
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(50.dp))
-            InputField(placeHolder = "Email", onValueChange = {})
+            InputField(value = value,placeHolder = "Email", onValueChange = {forgotPasswordViewModel.onEmailChange(it)})
             Spacer(modifier = Modifier.height(50.dp))
             CustomButton(
-                onClickChange = verifyClick, text = "Send Email", textColor = 0xFFFFFFFF,
+                onClickChange = {forgotPasswordViewModel.sendEmail()}, text = "Send Email", textColor = 0xFFFFFFFF,
                 backgroundColor = Color(0xFF0D6EFD),
                 imageResId = null
             )
@@ -81,5 +88,8 @@ fun ForgotPasswordScreen(verifyClick: () -> Unit)
 @Composable
 fun ForgotPasswordAScreenPreview()
 {
-    ForgotPasswordScreen {}
+    ForgotPasswordScreen(
+        backClick = {},
+        forgotPasswordViewModel = viewModel(factory = ForgotPasswordViewModel.Factory)
+    )
 }
