@@ -25,78 +25,102 @@ import com.example.carrental_fe.screen.component.BackButton
 import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.component.InputField
 import com.example.carrental_fe.screen.component.PasswordField
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.viewModelFactory
 
 @Composable
-fun ResetPasswordScreen(verifyClick:()-> Unit)
-{
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black),
-        contentAlignment = Alignment.Center
-    )
-    {
-        Column(
+fun ResetPasswordScreen(
+    resetPasswordViewModel: ResetPasswordViewModel,
+    email : String
+) {
+    LaunchedEffect(Unit) {
+        resetPasswordViewModel.initEmail(email)
+    }
+
+    val verificationCode by resetPasswordViewModel.verificationCode.collectAsState()
+    val password by resetPasswordViewModel.password.collectAsState()
+    val isPasswordVisible by resetPasswordViewModel.isPasswordVisible.collectAsState()
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White, shape = RoundedCornerShape(20.dp))
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.Start
-        ){
-            Spacer(modifier = Modifier.height(50.dp))
+                .background(Color.Black),
+            contentAlignment = Alignment.Center
+        )
+        {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White, shape = RoundedCornerShape(20.dp))
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Spacer(modifier = Modifier.height(50.dp))
 
-            BackButton(onClick = {}, iconResId = R.drawable.back_icon)
+                BackButton(onClick = {}, iconResId = R.drawable.back_icon)
 
-            Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
-            Text(
-                text = "Reset Password",
-                fontSize = 28.sp,
-                fontFamily = FontFamily(Font(R.font.montserrat_bold)),
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = "Please enter your Verification Code \n and New Password ",
-                fontSize = 16.sp,
-                fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-                color = Color(0xFF707B81),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.height(50.dp))
-            Text(
-                text = "Verification Code",
-                fontSize = 16.sp,
-                fontFamily = FontFamily(Font(R.font.montserrat_medium)),
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            InputField(placeHolder = "xxxxxx", onValueChange = {})
-            Spacer(modifier = Modifier.height(30.dp))
-            Text(
-                text = "Password",
-                fontSize = 16.sp,
-                fontFamily = FontFamily(Font(R.font.montserrat_medium)),
-                color = Color.Black
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            PasswordField(togglePassWordVisibility = {}, onValueChange = {})
-            Spacer(modifier = Modifier.height(50.dp))
-            CustomButton(
-                onClickChange = verifyClick, text = "Confirm", textColor = 0xFFFFFFFF,
-                backgroundColor = Color(0xFF0D6EFD),
-                imageResId = null
-            )
+                Text(
+                    text = "Reset Password",
+                    fontSize = 28.sp,
+                    fontFamily = FontFamily(Font(R.font.montserrat_bold)),
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Please enter your Verification Code \n and New Password ",
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+                    color = Color(0xFF707B81),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Spacer(modifier = Modifier.height(50.dp))
+                Text(
+                    text = "Verification Code",
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(R.font.montserrat_medium)),
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                InputField(placeHolder = "xxxxxx",
+                    onValueChange = {resetPasswordViewModel.onVerificationCodeChange(it)},
+                    value = verificationCode)
+
+                Spacer(modifier = Modifier.height(30.dp))
+                Text(
+                    text = "Password",
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(R.font.montserrat_medium)),
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                PasswordField(togglePassWordVisibility = {resetPasswordViewModel.togglePasswordVisibility()},
+                    onValueChange = {resetPasswordViewModel.onPasswordChange(it)},
+                    value = password,
+                    isPasswordVisible = isPasswordVisible)
+                Spacer(modifier = Modifier.height(50.dp))
+                CustomButton(
+                    onClickChange = {resetPasswordViewModel.resetPassword()}, text = "Confirm", textColor = 0xFFFFFFFF,
+                    backgroundColor = Color(0xFF0D6EFD),
+                    imageResId = null
+                )
+            }
         }
     }
-}
 
 @Preview
 @Composable
 fun PreviewResetPasswordScreen()
 {
-    ResetPasswordScreen({})
+    ResetPasswordScreen(
+        resetPasswordViewModel = viewModel(),
+        email = ""
+    )
 }
