@@ -27,9 +27,24 @@ import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.component.InputField
 import com.example.carrental_fe.screen.component.InputLabel
 import com.example.carrental_fe.screen.component.PasswordField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.flow.compose
 
 @Composable
-fun LoginScreen (onSignUpClick: () -> Unit, onRecoveryClick: () -> Unit){
+fun LoginScreen(
+    loginViewModel: LoginViewModel,
+    onSignUpClick: () -> Unit,
+    onRecoveryClick: () -> Unit)
+{
+    LaunchedEffect(Unit) {
+        loginViewModel.resetFields()
+    }
+    val username by loginViewModel.username.collectAsState()
+    val password by loginViewModel.password.collectAsState()
+    val isPasswordVisible by loginViewModel.isPasswordVisible.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -70,13 +85,16 @@ fun LoginScreen (onSignUpClick: () -> Unit, onRecoveryClick: () -> Unit){
 
             InputLabel(text = "Username", drawable = R.drawable.user)
             Spacer(modifier = Modifier.height(12.dp))
-            InputField(placeHolder = "Username", onValueChange = {})
+            InputField(value = username, placeHolder = "Username", onValueChange = {loginViewModel.onUsernameChange(it)})
 
             Spacer(modifier = Modifier.height(30.dp))
 
             InputLabel(text = "Password", R.drawable.password)
             Spacer(modifier = Modifier.height(12.dp))
-            PasswordField(onValueChange = {  }, togglePassWordVisibility = {})
+            PasswordField(value = password,
+                onValueChange = { loginViewModel.onPasswordChange(it)},
+                togglePassWordVisibility = {loginViewModel.togglePasswordVisibility()},
+                isPasswordVisible = isPasswordVisible)
 
             Text(
                 text = "Recovery Password",
@@ -90,9 +108,10 @@ fun LoginScreen (onSignUpClick: () -> Unit, onRecoveryClick: () -> Unit){
             )
 
             CustomButton(
-                backgroundColor = Color(0xFF0D6EFD), // Màu xanh
+                backgroundColor = Color(0xFF0D6EFD),
                 text = "Sign In",
-                textColor = 0xFFFFFFFF
+                textColor = 0xFFFFFFFF,
+                onClickChange = {loginViewModel.login()}
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -122,5 +141,9 @@ fun LoginScreen (onSignUpClick: () -> Unit, onRecoveryClick: () -> Unit){
 @Composable
 @Preview
 fun LoginScreenPreview(){
-    LoginScreen(onSignUpClick = {}, {})
+    LoginScreen(
+        loginViewModel = viewModel(factory = LoginViewModel.Factory),
+        onSignUpClick = {},
+        onRecoveryClick = {}
+    )
 }
