@@ -25,10 +25,22 @@ import com.example.carrental_fe.R
 import com.example.carrental_fe.screen.component.BackButton
 import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.component.InputField
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun VerifyAccountScreen(onBackClick: () -> Unit, onVerifyClick: () -> Unit, onResendClick:()-> Unit)
+fun VerifyAccountScreen(
+    onBackClick:() -> Unit,
+    verifyAccountViewModel : VerifyAccountViewModel,
+    email : String
+)
 {
+    LaunchedEffect(Unit) {
+        verifyAccountViewModel.email = email
+    }
+    val verificationCode by verifyAccountViewModel.verificationCode.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -68,7 +80,9 @@ fun VerifyAccountScreen(onBackClick: () -> Unit, onVerifyClick: () -> Unit, onRe
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(50.dp))
-            InputField(placeHolder = "Verification Code", onValueChange = {})
+            InputField(placeHolder = "Verification Code",
+                onValueChange = {verifyAccountViewModel.onVerificationCodeChange(it)},
+                value = verificationCode)
             Text(
                 text = "Resend Email",
                 fontFamily = FontFamily(Font(R.font.montserrat_medium)),
@@ -77,10 +91,10 @@ fun VerifyAccountScreen(onBackClick: () -> Unit, onVerifyClick: () -> Unit, onRe
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(top = 12.dp, bottom = 30.dp)
-                    .clickable {onResendClick()}
+                    .clickable {verifyAccountViewModel.resendVerificationCode()}
             )
             CustomButton(
-                onClickChange = onVerifyClick, text = "Verify", textColor = 0xFFFFFFFF,
+                onClickChange = {verifyAccountViewModel.verifyAccount()}, text = "Verify", textColor = 0xFFFFFFFF,
                 backgroundColor = Color(0xFF0D6EFD),
                 imageResId = null
             )
@@ -92,5 +106,9 @@ fun VerifyAccountScreen(onBackClick: () -> Unit, onVerifyClick: () -> Unit, onRe
 @Preview
 fun VerifyAccountScreenPreview()
 {
-    VerifyAccountScreen({}, {}, {})
+    VerifyAccountScreen(
+        onBackClick = {},
+        verifyAccountViewModel = viewModel(factory = VerifyAccountViewModel.Factory),
+        email = ""
+    )
 }

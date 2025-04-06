@@ -28,9 +28,26 @@ import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.component.InputField
 import com.example.carrental_fe.screen.component.InputLabel
 import com.example.carrental_fe.screen.component.PasswordField
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.getValue
+import okhttp3.Call
+
 
 @Composable
-fun RegisterScreen(onBackClick: () -> Unit, onLoginClick: () -> Unit) {
+fun RegisterScreen(onBackClick: () -> Unit = {},
+                   onLoginClick: () -> Unit = {},
+                   signUpViewModel: SignUpViewModel
+){
+    LaunchedEffect(Unit) {
+        signUpViewModel.resetFields()
+    }
+    val username by signUpViewModel.username.collectAsState()
+    val displayName by signUpViewModel.displayName.collectAsState()
+    val email by signUpViewModel.email.collectAsState()
+    val password by signUpViewModel.password.collectAsState()
+    val isPasswordVisible by signUpViewModel.isPasswordVisible.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -67,28 +84,31 @@ fun RegisterScreen(onBackClick: () -> Unit, onLoginClick: () -> Unit) {
 
             InputLabel(text = "Username", drawable = R.drawable.user)
             Spacer(modifier = Modifier.height(5.dp))
-            InputField(placeHolder = "Username", onValueChange = {})
+            InputField(placeHolder = "Username", onValueChange = {signUpViewModel.onUsernameChange(it)},value = username)
             Spacer(modifier = Modifier.height(10.dp))
 
             InputLabel(text = "Your Name", drawable = R.drawable.displayname)
             Spacer(modifier = Modifier.height(5.dp))
-            InputField(placeHolder = "Your Name", onValueChange = {})
+            InputField(placeHolder = "Your Name", onValueChange = {signUpViewModel.onDisplayNameChange(it)},value = displayName)
             Spacer(modifier = Modifier.height(10.dp))
 
             InputLabel(text = "Email Address", R.drawable.email)
             Spacer(modifier = Modifier.height(5.dp))
-            InputField(placeHolder = "Email", onValueChange = {})
+            InputField(placeHolder = "Email", onValueChange = {signUpViewModel.onEmailChange(it)}, value = email)
             Spacer(modifier = Modifier.height(10.dp))
 
             InputLabel(text = "Password", R.drawable.password)
             Spacer(modifier = Modifier.height(5.dp))
             PasswordField(
-                onValueChange = {},
-                togglePassWordVisibility = {})
+                onValueChange = { signUpViewModel.onPasswordChange(it) },
+                togglePassWordVisibility = { signUpViewModel.togglePasswordVisibility() },
+                value = password,
+                isPasswordVisible = isPasswordVisible)
 
             Spacer(modifier = Modifier.height(60.dp))
 
             CustomButton(
+                onClickChange = {signUpViewModel.register()},
                 backgroundColor = Color(0xFF0D6EFD),
                 text = "Sign Up",
                 textColor = 0xFFFFFFFF
@@ -112,5 +132,7 @@ fun RegisterScreen(onBackClick: () -> Unit, onLoginClick: () -> Unit) {
 @Preview
 @Composable
 fun RegisterScreenPreview() {
-    RegisterScreen(onBackClick = {}, onLoginClick = {})
+    RegisterScreen(onBackClick = {},
+        onLoginClick =  {},
+        signUpViewModel = viewModel (factory = SignUpViewModel.Factory))
 }
