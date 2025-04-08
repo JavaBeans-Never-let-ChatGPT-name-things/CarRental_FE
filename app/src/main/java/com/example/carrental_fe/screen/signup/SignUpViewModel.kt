@@ -65,7 +65,9 @@ class SignUpViewModel (private val authenticationRepository: AuthenticationRepos
         _displayName.value = ""
         _email.value = ""
     }
-
+    fun resetState() {
+        _signUpState.value = SignUpState.Idle
+    }
     fun register()
     {
         viewModelScope.launch {

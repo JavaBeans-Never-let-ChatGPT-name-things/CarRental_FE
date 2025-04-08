@@ -30,6 +30,12 @@ class ForgotPasswordViewModel (private val authenticationRepository: Authenticat
     fun onEmailChange(newEmail: String) {
         _email.value = newEmail
     }
+    fun resetState() {
+        _forgotPasswordState.value = ForgotPasswordState.Idle
+    }
+    fun resetEmail() {
+        _email.value = ""
+    }
     fun sendEmail()
     {
         viewModelScope.launch {

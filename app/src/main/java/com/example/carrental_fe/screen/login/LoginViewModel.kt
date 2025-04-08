@@ -44,7 +44,9 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
     fun togglePasswordVisibility() {
         _isPasswordVisible.value = !_isPasswordVisible.value
     }
-
+    fun resetState() {
+        _loginState.value = LoginState.Idle
+    }
     fun resetFields() {
         _username.value = ""
         _password.value = ""
