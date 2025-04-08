@@ -1,3 +1,4 @@
+
 package com.example.carrental_fe.screen.login
 
 import androidx.compose.foundation.background
@@ -11,7 +12,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,29 +29,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.component.CustomButton
-import com.example.carrental_fe.screen.component.InputField
-import com.example.carrental_fe.screen.component.InputLabel
-import com.example.carrental_fe.screen.component.PasswordField
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.flow.compose
+import com.example.carrental_fe.R
+import com.example.carrental_fe.dialog.ErrorDialog
+import com.example.carrental_fe.dialog.LoadingDialog
+import com.example.carrental_fe.dto.response.TokenResponse
+import com.example.carrental_fe.screen.component.*
+
 
 @Composable
-fun LoginScreen(
-    loginViewModel: LoginViewModel,
-    onSignUpClick: () -> Unit,
-    onRecoveryClick: () -> Unit)
-{
-    LaunchedEffect(Unit) {
-        loginViewModel.resetFields()
-    }
+fun LoginScreen (
+    loginViewModel: LoginViewModel =viewModel(factory = LoginViewModel.Factory),
+    onSignUpNav: () -> Unit,
+    onRecoveryNav: () -> Unit,
+    onLoginSuccessNav: (TokenResponse) -> Unit ){
     val username by loginViewModel.username.collectAsState()
     val password by loginViewModel.password.collectAsState()
     val isPasswordVisible by loginViewModel.isPasswordVisible.collectAsState()
+    val loginState by loginViewModel.loginState.collectAsState()
+
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var showLoadingDialog by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +65,6 @@ fun LoginScreen(
         ) {
             Spacer(modifier = Modifier.height(106.dp))
 
-            // Tiêu đề
             Text(
                 text = "Hello!",
                 fontSize = 32.sp,
@@ -92,7 +96,7 @@ fun LoginScreen(
             InputLabel(text = "Password", R.drawable.password)
             Spacer(modifier = Modifier.height(12.dp))
             PasswordField(value = password,
-                onValueChange = { loginViewModel.onPasswordChange(it)},
+                onValueChange = {loginViewModel.onPasswordChange(it)},
                 togglePassWordVisibility = {loginViewModel.togglePasswordVisibility()},
                 isPasswordVisible = isPasswordVisible)
 
@@ -104,7 +108,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(top = 12.dp, bottom = 30.dp)
-                    .clickable{ onRecoveryClick()}
+                    .clickable { onRecoveryNav() }
             )
 
             CustomButton(
@@ -132,18 +136,31 @@ fun LoginScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onSignUpClick() }
+                    .clickable { onSignUpNav() }
             )
         }
     }
-}
+    LaunchedEffect(loginState) {
+        when (loginState) {
+            is LoginState.Loading -> showLoadingDialog = true
+            is LoginState.Error -> {
+                showLoadingDialog = false
+                showErrorDialog = true
+            }
+            is LoginState.Success -> {
+                showLoadingDialog = false
+                onLoginSuccessNav((loginState as LoginState.Success).tokenResponse)
+                loginViewModel.resetFields()
+                loginViewModel.resetState()
+            }
+            else -> showLoadingDialog = false
+        }
+    }
+    if (showLoadingDialog) {
+        LoadingDialog(text = "Please wait...")
+    }
 
-@Composable
-@Preview
-fun LoginScreenPreview(){
-    LoginScreen(
-        loginViewModel = viewModel(factory = LoginViewModel.Factory),
-        onSignUpClick = {},
-        onRecoveryClick = {}
-    )
+    if (showErrorDialog) {
+        ErrorDialog { showErrorDialog = false }
+    }
 }

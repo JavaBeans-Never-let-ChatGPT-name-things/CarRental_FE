@@ -11,7 +11,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
@@ -21,26 +27,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.component.BackButton
-import com.example.carrental_fe.screen.component.CustomButton
-import com.example.carrental_fe.screen.component.InputField
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.carrental_fe.*
+import com.example.carrental_fe.dto.response.TokenResponse
+import com.example.carrental_fe.nav.Admin
+import com.example.carrental_fe.nav.User
+import com.example.carrental_fe.screen.component.*
+
 
 @Composable
 fun VerifyAccountScreen(
-    onBackClick:() -> Unit,
-    verifyAccountViewModel : VerifyAccountViewModel,
-    email : String
+    onBackNav: () -> Unit,
+    verifyAccountViewModel: VerifyAccountViewModel = viewModel(factory = VerifyAccountViewModel.Factory),
+    onVerifySuccessNav: (TokenResponse) -> Unit
 )
 {
-    LaunchedEffect(Unit) {
-        verifyAccountViewModel.email = email
-    }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var showLoadingDialog by remember { mutableStateOf(false) }
+
     val verificationCode by verifyAccountViewModel.verificationCode.collectAsState()
+    val verifyAccountState by verifyAccountViewModel.verifyAccountState.collectAsState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -57,8 +63,7 @@ fun VerifyAccountScreen(
         ){
             Spacer(modifier = Modifier.height(50.dp))
 
-            // Nút Back
-            BackButton(onClick = onBackClick, iconResId = R.drawable.back_icon)
+            BackButton(onClick = onBackNav, iconResId = R.drawable.back_icon)
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -81,7 +86,7 @@ fun VerifyAccountScreen(
             )
             Spacer(modifier = Modifier.height(50.dp))
             InputField(placeHolder = "Verification Code",
-                onValueChange = {verifyAccountViewModel.onVerificationCodeChange(it)},
+                onValueChange = { verifyAccountViewModel.onVerificationCodeChange(it) },
                 value = verificationCode)
             Text(
                 text = "Resend Email",
@@ -91,13 +96,28 @@ fun VerifyAccountScreen(
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(top = 12.dp, bottom = 30.dp)
-                    .clickable {verifyAccountViewModel.resendVerificationCode()}
+                    .clickable { verifyAccountViewModel.resendVerificationCode() }
             )
             CustomButton(
-                onClickChange = {verifyAccountViewModel.verifyAccount()}, text = "Verify", textColor = 0xFFFFFFFF,
+                onClickChange = { verifyAccountViewModel.verifyAccount() },
+                text = "Verify", textColor = 0xFFFFFFFF,
                 backgroundColor = Color(0xFF0D6EFD),
                 imageResId = null
             )
+        }
+    }
+    LaunchedEffect(verifyAccountState) {
+        when (verifyAccountState) {
+            is VerifyAccountState.Loading -> showLoadingDialog = true
+            is VerifyAccountState.Error -> {
+                showLoadingDialog = false
+                showErrorDialog = true
+            }
+            is VerifyAccountState.Success -> {
+                showLoadingDialog = false
+                onVerifySuccessNav((verifyAccountState as VerifyAccountState.Success).tokenResponse)
+            }
+            else -> showLoadingDialog = false
         }
     }
 }
@@ -107,8 +127,7 @@ fun VerifyAccountScreen(
 fun VerifyAccountScreenPreview()
 {
     VerifyAccountScreen(
-        onBackClick = {},
-        verifyAccountViewModel = viewModel(factory = VerifyAccountViewModel.Factory),
-        email = ""
+        onBackNav = {},
+        onVerifySuccessNav = {}
     )
 }
