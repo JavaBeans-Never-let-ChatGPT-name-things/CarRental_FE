@@ -38,10 +38,10 @@ import androidx.compose.ui.unit.sp
 import com.example.carrental_fe.R
 
 @Composable
-fun InputField(placeHolder:String, onValueChange:() -> Unit, modifier: Modifier = Modifier){
+fun InputField(value:String, placeHolder:String, onValueChange:(String) -> Unit, modifier: Modifier = Modifier){
     TextField(
-        value = "",
-        onValueChange = { onValueChange() },
+        value = value,
+        onValueChange = { onValueChange(it) },
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFFF7F7F9), shape = RoundedCornerShape(12.dp))
@@ -59,12 +59,16 @@ fun InputField(placeHolder:String, onValueChange:() -> Unit, modifier: Modifier 
 }
 
 @Composable
-fun PasswordField(togglePassWordVisibility: () -> Unit, onValueChange:() -> Unit, modifier: Modifier = Modifier)
+fun PasswordField(value: String,
+                  isPasswordVisible : Boolean,
+                  togglePassWordVisibility: () -> Unit,
+                  onValueChange: (String) -> Unit,
+                  modifier: Modifier = Modifier)
 {
-    val isPasswordVisible = false
+
     TextField(
-        value = "",
-        onValueChange = { onValueChange() },
+        value = value,
+        onValueChange = { onValueChange(it) },
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFFF7F7F9), shape = RoundedCornerShape(12.dp))
@@ -73,12 +77,13 @@ fun PasswordField(togglePassWordVisibility: () -> Unit, onValueChange:() -> Unit
         singleLine = true,
         visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
+            val icon = if (isPasswordVisible) R.drawable.eye else R.drawable.eye_slash
             Icon(
-                painter = painterResource(id = R.drawable.eye_slash), // Thay bằng ID ảnh của bạn
+                painter = painterResource(id = icon),
                 contentDescription = "Toggle Password",
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { togglePassWordVisibility },
+                    .clickable { togglePassWordVisibility() },
                 tint = Color.Gray
             )
         },
@@ -100,7 +105,7 @@ fun CustomButton(
     textColor: Long
 ) {
     Button(
-        onClick = { onClickChange },
+        onClick = { onClickChange() },
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier

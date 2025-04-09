@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">CarRental_FE</string>
+    <string name="home_screen_label">Home</string>
+    <string name="favcar_screen_label">FavCar</string>
+    <string name="contract_screen_label">Contracts</string>
+    <string name="notification_screen_label">Noti</string>
+    <string name="profile_screen_label">Profile</string>
 </resources>
