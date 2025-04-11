@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -21,7 +22,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -33,13 +36,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.carrental_fe.R
 
 @Composable
 fun HomeScreen(
     onNavigateToSearchScreen: () -> Unit,
-
-    ) {
+    viewModel: UserHomeScreenViewModel
+) {
 
     val listState = rememberLazyListState()
     val isAtBottom by remember {
@@ -49,14 +55,47 @@ fun HomeScreen(
             lastVisibleItem?.index == totalItemsCount - 1
         }
     }
+    val selectedBrand by viewModel.selectedBrand.collectAsState()
+    val carBrands by viewModel.carBrands.collectAsState()
+    val cars by viewModel.carList.collectAsState()
+    val totalPages by viewModel.totalPages.collectAsState()
+    val currentPage by viewModel.currentPage.collectAsState()
+    val favourtiteCars by viewModel.favouriteCars.collectAsState()
+    LaunchedEffect(currentPage) {
+        listState.animateScrollToItem(0)
+    }
+    LaunchedEffect(selectedBrand) {
+        listState.animateScrollToItem(0)
+    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                viewModel.storeHomeScreenState()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+    LaunchedEffect(true) {
+        if (viewModel.shouldResetPage()) {
+            viewModel.resetPage()
+        }
+    }
+    LaunchedEffect(Unit) {
+        if (currentPage != 1 || selectedBrand != null){
+            viewModel.resetPage()
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(16.dp)
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
+        Box(modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         )
         {
@@ -84,59 +123,72 @@ fun HomeScreen(
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
                     .clickable {
-
+                        if (selectedBrand != null) {
+                            viewModel.resetPage()
+                        }
                     }
             )
         }
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(0) {
-            }
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {items(carBrands) { brand ->
+            BrandLogoCard(
+                carBrand = brand,
+                isSelected = selectedBrand?.id == brand.id,
+                onBrandClick = {
+                    viewModel.loadCarsByBrand(brand)
+                }
+            )
+        }
         }
 
         Spacer(Modifier.height(16.dp))
-        Text(
-            "Cars List", fontFamily = FontFamily(Font(R.font.montserrat_medium)),
+        Text("Cars List", fontFamily = FontFamily(Font(R.font.montserrat_medium)),
             fontWeight = FontWeight.SemiBold,
-            fontSize = 18.sp
-        )
+            fontSize = 18.sp)
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
         ) {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxSize(),
                 state = listState
             ) {
-                items(0) {
+                items(cars) { car ->
+                    CarCard(
+                        car = car,
+                        isFavorite = favourtiteCars.any { it.id == car.id },
+                        onFavoriteClick = {
+                            viewModel.toggleFavourite(car.id) },
+                        onCarCardClick = { }
+                    )
                 }
             }
         }
+        if (isAtBottom && cars.isNotEmpty()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { viewModel.prevPage() }, enabled = currentPage > 1) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous")
+                }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { }, enabled = false) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous")
-            }
+                (1..totalPages).forEach { page ->
+                    Text(
+                        text = page.toString(),
+                        modifier = Modifier
+                            .padding(horizontal = 6.dp)
+                            .clickable { viewModel.goToPage(page) },
+                        color = if (page == currentPage) Color(0xFF0D6EFD) else Color.Gray,
+                        fontWeight = if (page == currentPage) FontWeight.Bold else FontWeight.Normal,
+                    )
+                }
 
-            (1..1).forEach { page ->
-                Text(
-                    text = page.toString(),
-                    modifier = Modifier
-                        .padding(horizontal = 6.dp)
-                        .clickable { },
-                    color = if (true) Color(0xFF0D6EFD) else Color.Gray,
-                    fontWeight = if (true) FontWeight.Bold else FontWeight.Normal,
-                )
-            }
-
-            IconButton(onClick = { }, enabled = false) {
-                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
+                IconButton(onClick = { viewModel.nextPage() }, enabled = currentPage < totalPages) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
+                }
             }
         }
     }

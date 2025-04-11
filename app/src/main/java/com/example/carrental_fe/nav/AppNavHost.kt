@@ -4,6 +4,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,6 +15,8 @@ import com.example.carrental_fe.screen.forgot.ForgotPasswordScreen
 import com.example.carrental_fe.screen.login.LoginScreen
 import com.example.carrental_fe.screen.resetPassword.ResetPasswordScreen
 import com.example.carrental_fe.screen.signup.RegisterScreen
+import com.example.carrental_fe.screen.user.SearchScreen
+import com.example.carrental_fe.screen.user.UserHomeScreenViewModel
 import com.example.carrental_fe.screen.verify.VerifyAccountScreen
 import kotlinx.serialization.Serializable
 
@@ -38,8 +41,13 @@ data object User
 @Serializable
 data object Admin
 
+@Serializable
+object Search
+
 @Composable
 fun AppNavHost(navController: NavHostController = rememberNavController()) {
+    val userHomeScreenViewModel: UserHomeScreenViewModel
+    = viewModel(factory = UserHomeScreenViewModel.Factory)
     NavHost(
         navController = navController,
         enterTransition = { slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn() },
@@ -103,7 +111,15 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                 }
             )
         }
-        composable<User> { UserRoute() }
+        composable<User> { UserRoute(
+            onNavigateToSearchScreen = {navController.navigate(route = Search) {
+                popUpTo(route = User) { inclusive = false }
+            }},
+            viewModel = userHomeScreenViewModel
+        ) }
         composable<Admin> { }
+        composable<Search> {
+            SearchScreen(viewModel = userHomeScreenViewModel)
+        }
     }
 }
