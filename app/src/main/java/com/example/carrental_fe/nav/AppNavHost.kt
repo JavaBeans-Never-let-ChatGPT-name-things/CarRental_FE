@@ -30,10 +30,10 @@ object SignUp
 object ForgotPassword
 
 @Serializable
-data class VerifyAccount(val email: String? = null)
+data class VerifyAccount (val email: String? = null)
 
 @Serializable
-data class ResetPassword(val email: String? = null)
+data class ResetPassword (val email: String? = null)
 
 @Serializable
 data object User
@@ -45,26 +45,24 @@ data object Admin
 object Search
 
 @Composable
-fun AppNavHost(navController: NavHostController = rememberNavController()) {
-    val userHomeScreenViewModel: UserHomeScreenViewModel
-    = viewModel(factory = UserHomeScreenViewModel.Factory)
-    NavHost(
-        navController = navController,
+fun AppNavHost (navController: NavHostController = rememberNavController())
+{
+    val homeScreenViewModel: UserHomeScreenViewModel = viewModel(factory = UserHomeScreenViewModel.Factory)
+    NavHost(navController = navController,
         enterTransition = { slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn() },
         popEnterTransition = { slideInHorizontally(initialOffsetX = { fullWidth -> -fullWidth }) + fadeIn() },
         exitTransition = { slideOutHorizontally(targetOffsetX = { fullWidth -> -fullWidth }) + fadeOut() },
         popExitTransition = { slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) + fadeOut() },
-        startDestination = Login
-    )
+        startDestination = Login)
     {
         composable<Login> {
             LoginScreen(
                 onSignUpNav = { navController.navigate(route = SignUp) },
-                onRecoveryNav = { navController.navigate(route = ForgotPassword) },
-                onLoginSuccessNav = { token ->
-                    navController.navigate(route = if (token.role == "ADMIN") Admin else User) {
-                        popUpTo(route = Login)
-                    }
+                onRecoveryNav =  { navController.navigate(route = ForgotPassword) },
+                onLoginSuccessNav = {
+                        token -> navController.navigate(route = if (token.role == "ADMIN") Admin else User){
+                    popUpTo(route = Login)
+                }
                 }
             )
         }
@@ -72,29 +70,30 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             RegisterScreen(
                 onBackNav = { navController.popBackStack() },
                 onLoginNav = { navController.popBackStack() },
-                onRegisterSuccessNav = { email ->
-                    navController.navigate(route = VerifyAccount(email)) {
-                        popUpTo(SignUp) { inclusive = true }
-                        launchSingleTop = true
-                    }
+                onRegisterSuccessNav = {
+                        email -> navController.navigate(route = VerifyAccount(email)){
+                    popUpTo(SignUp) { inclusive = true }
+                    launchSingleTop = true
+                }
                 }
             )
         }
         composable<ForgotPassword> {
             ForgotPasswordScreen(
-                onBackNav = { navController.popBackStack() },
-                onSendEmailSuccessNav = { emailForgot ->
-                    navController.navigate(route = ResetPassword(emailForgot)) {
-                        popUpTo(route = ForgotPassword) { inclusive = true }
-                        launchSingleTop = true
-                    }
+                onBackNav = { navController.popBackStack()},
+                onSendEmailSuccessNav = {
+                        emailForgot -> navController.navigate(route = ResetPassword(emailForgot)){
+                    popUpTo(route = ForgotPassword) { inclusive = true }
+                    launchSingleTop = true
+                }
                 }
             )
         }
         composable<VerifyAccount> {
             VerifyAccountScreen(
                 onBackNav = { navController.popBackStack() },
-                onVerifySuccessNav = { token: TokenResponse ->
+                onVerifySuccessNav = {
+                        token: TokenResponse ->
                     val role = token.role
                     navController.navigate(route = if (role == "ADMIN") Admin else User) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = false }
@@ -115,11 +114,11 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
             onNavigateToSearchScreen = {navController.navigate(route = Search) {
                 popUpTo(route = User) { inclusive = false }
             }},
-            viewModel = userHomeScreenViewModel
+            viewModel = homeScreenViewModel
         ) }
-        composable<Admin> { }
-        composable<Search> {
-            SearchScreen(viewModel = userHomeScreenViewModel)
+        composable<Admin> {  }
+        composable <Search> {
+            SearchScreen(viewModel = homeScreenViewModel)
         }
     }
 }
