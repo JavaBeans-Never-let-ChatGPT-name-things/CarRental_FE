@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.carrental_fe.dto.response.TokenResponse
+import com.example.carrental_fe.screen.UserRoute
 import com.example.carrental_fe.screen.forgot.ForgotPasswordScreen
 import com.example.carrental_fe.screen.login.LoginScreen
 import com.example.carrental_fe.screen.resetPassword.ResetPasswordScreen
@@ -102,7 +103,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                 }
             )
         }
-        composable<User> {  }
+        composable<User> { UserRoute() }
         composable<Admin> { }
     }
 }
