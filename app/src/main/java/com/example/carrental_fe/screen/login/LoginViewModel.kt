@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.carrental_fe.CarRentalApplication
+import com.example.carrental_fe.data.TokenManager
 
 sealed class LoginState {
     object Idle : LoginState()
@@ -20,7 +21,8 @@ sealed class LoginState {
     data class Success(val tokenResponse: TokenResponse) : LoginState()
     data class Error(val message: String) : LoginState()
 }
-class LoginViewModel (private val authenticationRepository: AuthenticationRepository) : ViewModel() {
+class LoginViewModel (private val authenticationRepository: AuthenticationRepository
+                      , private val tokenManager: TokenManager) : ViewModel() {
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
@@ -32,7 +34,9 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState
-
+    fun resetState() {
+        _loginState.value = LoginState.Idle
+    }
     fun onUsernameChange(newUsername: String) {
         _username.value = newUsername
     }
@@ -44,9 +48,7 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
     fun togglePasswordVisibility() {
         _isPasswordVisible.value = !_isPasswordVisible.value
     }
-    fun resetState() {
-        _loginState.value = LoginState.Idle
-    }
+
     fun resetFields() {
         _username.value = ""
         _password.value = ""
@@ -59,6 +61,11 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
             try {
                 val response = authenticationRepository.login(LoginRequest(_username.value, _password.value))
                 _loginState.value = LoginState.Success(response)
+                tokenManager.saveTokens(
+                    response.accessToken,
+                    response.refreshToken,
+                    response.role
+                )
             } catch (e: Exception) {
                 _loginState.value = LoginState.Error(e.message ?: "Login failed")
             }
@@ -69,7 +76,8 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
             initializer {
                 val application = (this[APPLICATION_KEY] as CarRentalApplication)
                 val authenticationRepository = application.container.authenticationRepository
-                LoginViewModel(authenticationRepository = authenticationRepository)
+                val tokenManager = TokenManager(application)
+                LoginViewModel(authenticationRepository = authenticationRepository, tokenManager = tokenManager)
             }
         }
     }

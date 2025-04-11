@@ -1,6 +1,8 @@
 package com.example.carrental_fe.data
 
+import android.content.Context
 import com.example.carrental_fe.network.AuthApi
+import com.example.carrental_fe.network.CarApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
