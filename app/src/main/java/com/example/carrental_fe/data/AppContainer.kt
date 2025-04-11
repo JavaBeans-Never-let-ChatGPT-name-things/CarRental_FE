@@ -1,6 +1,8 @@
 package com.example.carrental_fe.data
 
+import android.content.Context
 import com.example.carrental_fe.network.AuthApi
+import com.example.carrental_fe.network.CarApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -10,28 +12,37 @@ import retrofit2.Retrofit
 
 interface AppContainer {
     val authenticationRepository: AuthenticationRepository
+    val carRepository: CarRepository
 }
 
-class DefaultAppContainer : AppContainer {
-    private val baseUrl =
-        "https://spaniel-genuine-muskrat.ngrok-free.app"
+class DefaultAppContainer(context: Context) : AppContainer {
 
-    val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY // Log toàn bộ request và response body
-    }
-    private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor) // Thêm LoggingInterceptor vào OkHttpClient
-        .build()
-    private val retrofit = Retrofit.Builder()
+    private val baseUrl = "https://spaniel-genuine-muskrat.ngrok-free.app"
+    private val tokenManager = TokenManager(context)
+
+    private val retrofit: Retrofit = Retrofit.Builder()
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
-        .client(okHttpClient)
         .baseUrl(baseUrl)
         .build()
 
-    private val retrofitService: AuthApi by lazy {
-        retrofit.create(AuthApi::class.java)
+    private val authApi: AuthApi = retrofit.create(AuthApi::class.java)
+
+    private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(AuthInterceptor(tokenManager))
+        .addInterceptor(TokenAuthenticator(tokenManager, authApi))
+        .build()
+
+    private val updatedRetrofit: Retrofit = retrofit.newBuilder()
+        .client(okHttpClient)
+        .build()
+
+    private val carApi: CarApi = updatedRetrofit.create(CarApi::class.java)
+
+    override val authenticationRepository: AuthenticationRepository by lazy {
+        AuthenticationRepositoryImpl(authApi)
     }
-    override val authenticationRepository: AuthenticationRepository by lazy{
-        AuthenticationRepositoryImpl(retrofitService)
+
+    override val carRepository: CarRepository by lazy {
+        CarRepositoryImpl(carApi)
     }
 }

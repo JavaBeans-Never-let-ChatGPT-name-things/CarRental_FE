@@ -23,6 +23,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.carrental_fe.R
+import com.example.carrental_fe.screen.user.HomeScreen
+import com.example.carrental_fe.screen.user.UserHomeScreenViewModel
 
 internal val defaultRoute = MainRoutes.HOME
 
@@ -59,6 +61,8 @@ internal enum class MainRoutes(
 }
 @Composable
 internal fun UserScreenNavGraph (
+    onNavigateToSearchScreen: () -> Unit,
+    viewModel: UserHomeScreenViewModel,
     currentRoute: MainRoutes,
     modifier: Modifier = Modifier
 ){
@@ -74,7 +78,9 @@ internal fun UserScreenNavGraph (
     ){
         when (it){
             MainRoutes.HOME -> {
-
+                HomeScreen(
+                    viewModel = viewModel,
+                    onNavigateToSearchScreen = onNavigateToSearchScreen)
             }
             MainRoutes.FAV_CAR -> {
 

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,7 +49,11 @@ import androidx.compose.ui.unit.sp
 import com.example.carrental_fe.R
 
 @Composable
-fun SearchScreen() {
+fun SearchScreen(viewModel: UserHomeScreenViewModel )
+{
+    LaunchedEffect(Unit) {
+        viewModel.resetSearchScreen()
+    }
     val listState = rememberLazyListState()
     val isAtBottom by remember {
         derivedStateOf {
@@ -57,8 +63,16 @@ fun SearchScreen() {
         }
     }
     var showContent by remember { mutableStateOf(false) }
+    val cars by viewModel.carList.collectAsState()
+    val query by viewModel.query.collectAsState()
+    val currentPage by viewModel.currentPage.collectAsState()
+    val favourtiteCars by viewModel.favouriteCars.collectAsState()
+    val totalPage by viewModel.totalPages.collectAsState()
     LaunchedEffect(Unit) {
         showContent = true
+    }
+    LaunchedEffect(currentPage) {
+        listState.animateScrollToItem(0)
     }
     AnimatedVisibility(
         visible = showContent,
@@ -78,8 +92,10 @@ fun SearchScreen() {
             Spacer(Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = "",
+                value = query,
                 onValueChange = {
+                    viewModel.setSearchQuery(it)
+                    viewModel.getCars()
                 },
                 placeholder = { Text("Looking for car", color = Color.Gray) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
@@ -112,38 +128,43 @@ fun SearchScreen() {
                         .weight(1f)
                         .fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    state = listState
-                ) {
-                    items(0) {
-
+                    state = listState) {
+                    items(cars) { car ->
+                        CarCard(
+                            car = car,
+                            isFavorite = favourtiteCars.any { it.id == car.id },
+                            onFavoriteClick = { viewModel.toggleFavourite(car.id) },
+                            onCarCardClick = { }
+                        )
                     }
                 }
 
+                if (isAtBottom && cars.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = { viewModel.prevSearchPage() }, enabled = currentPage > 1) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous")
+                        }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { }, enabled = true) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous")
-                    }
+                        (1..totalPage).forEach { page ->
+                            Text(
+                                text = page.toString(),
+                                modifier = Modifier
+                                    .padding(horizontal = 6.dp)
+                                    .clickable { viewModel.gotoSearchPage(page) },
+                                color = if (page == currentPage) Color(0xFF0D6EFD) else Color.Gray,
+                                fontWeight = if (page == currentPage) FontWeight.Bold else FontWeight.Normal,
+                            )
+                        }
 
-                    (1..1).forEach { page ->
-                        Text(
-                            text = page.toString(),
-                            modifier = Modifier
-                                .padding(horizontal = 6.dp)
-                                .clickable { },
-                            color = if (true) Color(0xFF0D6EFD) else Color.Gray,
-                            fontWeight = if (true) FontWeight.Bold else FontWeight.Normal,
-                        )
-                    }
-
-                    IconButton(onClick = {}, enabled = false) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
+                        IconButton(onClick = { viewModel.nextSearchPage() }, enabled = currentPage < totalPage) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next")
+                        }
                     }
                 }
             }

@@ -18,9 +18,13 @@ import androidx.compose.ui.res.stringResource
 import com.example.carrental_fe.nav.MainRoutes
 import com.example.carrental_fe.nav.UserScreenNavGraph
 import com.example.carrental_fe.nav.defaultRoute
+import com.example.carrental_fe.screen.user.UserHomeScreenViewModel
 
 @Composable
-fun UserRoute()
+fun UserRoute(
+    onNavigateToSearchScreen: () -> Unit,
+    viewModel: UserHomeScreenViewModel
+)
 {
     var currentRoute by rememberSaveable { mutableStateOf(defaultRoute) }
     Scaffold (
@@ -54,6 +58,8 @@ fun UserRoute()
     ) {
             innerPadding ->
         UserScreenNavGraph(
+            onNavigateToSearchScreen = onNavigateToSearchScreen,
+            viewModel = viewModel,
             currentRoute = currentRoute,
             modifier = Modifier.padding(innerPadding)
         )

@@ -8,6 +8,8 @@ import com.example.carrental_fe.dto.response.TokenResponse
 import com.example.carrental_fe.dto.request.VerifyUserRequest
 import com.example.carrental_fe.dto.response.MessageResponse
 import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface AuthApi {
@@ -31,5 +33,9 @@ interface AuthApi {
 
     @POST("/api/auth/resendForgot")
     suspend fun resendForgot(@Body emailRequest: EmailRequest) : MessageResponse
+    @GET("/api/auth/refresh")
+    suspend fun refresh(
+        @Header("Authorization") token: String
+    ): TokenResponse
 
 }

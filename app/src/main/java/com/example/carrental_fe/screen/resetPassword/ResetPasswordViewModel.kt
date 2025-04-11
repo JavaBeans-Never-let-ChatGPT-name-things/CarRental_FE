@@ -1,15 +1,19 @@
 package com.example.carrental_fe.screen.resetPassword
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.toRoute
 import com.example.carrental_fe.CarRentalApplication
 import com.example.carrental_fe.data.AuthenticationRepository
 import com.example.carrental_fe.dto.request.ResetPasswordRequest
 import com.example.carrental_fe.dto.response.MessageResponse
+import com.example.carrental_fe.nav.ResetPassword
 import com.example.carrental_fe.screen.verify.VerifyAccountViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +25,11 @@ sealed class ResetPasswordState {
     data class Success(val messageResponse: MessageResponse) : ResetPasswordState()
     data class Error(val message: String) : ResetPasswordState()
 }
-class ResetPasswordViewModel(private val authenticationRepository: AuthenticationRepository) : ViewModel() {
+class ResetPasswordViewModel(private val authenticationRepository: AuthenticationRepository,
+                             savedStateHandle: SavedStateHandle
+) : ViewModel() {
+    private val email = savedStateHandle.toRoute<ResetPassword>()
+
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password
 
@@ -34,10 +42,6 @@ class ResetPasswordViewModel(private val authenticationRepository: Authenticatio
     private val _resetPasswordState = MutableStateFlow<ResetPasswordState>(ResetPasswordState.Idle)
     val resetPasswordState: StateFlow<ResetPasswordState> = _resetPasswordState
 
-    lateinit var email: String
-    fun initEmail(email: String) {
-        this.email = email
-    }
 
     fun togglePasswordVisibility() {
         _isPasswordVisible.value = !_isPasswordVisible.value
@@ -55,7 +59,7 @@ class ResetPasswordViewModel(private val authenticationRepository: Authenticatio
             try {
                 _resetPasswordState.value = ResetPasswordState.Loading
                 val response = authenticationRepository.reset(ResetPasswordRequest(
-                    email = email,
+                    email = email.email?:"",
                     verificationCode = _verificationCode.value,
                     newPassword = _password.value
                 ))
@@ -71,7 +75,8 @@ class ResetPasswordViewModel(private val authenticationRepository: Authenticatio
             initializer {
                 val application = (this[APPLICATION_KEY] as CarRentalApplication)
                 val authenticationRepository = application.container.authenticationRepository
-                ResetPasswordViewModel(authenticationRepository = authenticationRepository)
+                val savedStateHandle = createSavedStateHandle()
+                ResetPasswordViewModel(authenticationRepository = authenticationRepository, savedStateHandle = savedStateHandle)
             }
         }
     }
