@@ -41,6 +41,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.datastore:datastore-preferences:1.1.4")
+    implementation("androidx.compose.material:material-icons-extended:1.6.0")
     implementation (libs.logging.interceptor)
     //Network dependencies
     implementation(libs.retrofit2.kotlinx.serialization.converter)
