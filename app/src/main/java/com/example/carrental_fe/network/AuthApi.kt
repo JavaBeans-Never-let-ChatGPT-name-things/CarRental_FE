@@ -31,5 +31,9 @@ interface AuthApi {
 
     @POST("/api/auth/resendForgot")
     suspend fun resendForgot(@Body emailRequest: EmailRequest) : MessageResponse
+    @GET("/api/auth/refresh")
+    suspend fun refresh(
+        @Header("Authorization") token: String
+    ): TokenResponse
 
 }
