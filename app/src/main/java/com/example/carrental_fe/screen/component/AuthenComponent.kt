@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -46,8 +47,9 @@ fun InputField(value:String, placeHolder:String, onValueChange:(String) -> Unit,
             .fillMaxWidth()
             .background(Color(0xFFF7F7F9), shape = RoundedCornerShape(12.dp))
             .padding(horizontal = 8.dp, vertical = 4.dp),
-        placeholder = { Text(placeHolder, color = Color.Gray) },
+        placeholder = { Text(placeHolder, color = Color.LightGray) },
         singleLine = true,
+        textStyle = TextStyle(color = Color.Gray, fontSize = 16.sp),
         colors = TextFieldDefaults.colors(
             unfocusedContainerColor = Color(0xFFF7F7F9),
             focusedContainerColor = Color(0xFFF7F7F9),
@@ -170,9 +172,9 @@ fun InputLabel(text: String, @DrawableRes drawable: Int) {
         Text(
             fontFamily = FontFamily(Font(R.font.montserrat_medium)),
             text = text,
-            fontSize = 16.sp,
+            fontSize = 14.sp,
             color = Color.Black,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Bold
         )
     }
 }

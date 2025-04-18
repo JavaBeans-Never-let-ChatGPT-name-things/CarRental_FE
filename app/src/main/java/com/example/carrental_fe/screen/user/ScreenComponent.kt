@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -41,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -205,10 +205,10 @@ fun SearchBar(
     }
 }
 @Composable
-fun TopTitle(title: String, modifier: Modifier = Modifier)
+fun TopTitle(title: String, modifier: Modifier = Modifier )
 {
     Box(
-        modifier = Modifier.wrapContentSize(),
+        modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -227,4 +227,10 @@ fun TopTitle(title: String, modifier: Modifier = Modifier)
             )
         }
     }
+}
+
+@Preview()
+@Composable
+fun Preview() {
+
 }
