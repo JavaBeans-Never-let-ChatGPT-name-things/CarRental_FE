@@ -5,14 +5,17 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,13 +44,34 @@ fun ProfileScreen() {
             .padding(16.dp)
     ) {
         // Tiêu đề
-        TopTitle(
-            title = "Profile",
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentSize(Alignment.Center)
-                .align(Alignment.CenterHorizontally)
-        )
+                .wrapContentHeight(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(), // Thêm padding nếu muốn
+                contentAlignment = Alignment.Center
+            ) {
+
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    TopTitle(title = "Profile")
+                }
+
+                Image(
+                    painter = painterResource(R.drawable.edit),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .offset(x = (-13).dp)
+                        .clickable { }
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(30.dp))
 
@@ -56,9 +80,9 @@ fun ProfileScreen() {
             painter = painterResource(id = R.drawable.male_avatar_svgrepo_com),
             contentDescription = "Profile Image",
             modifier = Modifier
-                .size(100.dp)
+                .size(110.dp)
                 .clip(CircleShape)
-                .border(1.dp, Color.Gray, CircleShape)
+                .border(1.dp, Color.White, CircleShape)
                 .align(Alignment.CenterHorizontally)
         )
 

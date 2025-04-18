@@ -212,7 +212,9 @@ fun TopTitle(title: String, modifier: Modifier = Modifier )
         contentAlignment = Alignment.Center
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            modifier = modifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.highlight),
