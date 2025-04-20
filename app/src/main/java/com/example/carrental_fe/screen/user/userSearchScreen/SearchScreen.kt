@@ -32,7 +32,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,14 +47,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.user.userHomeScreen.CarCard
-import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
-import com.example.carrental_fe.screen.user.userHomeScreen.UserHomeScreenViewModel
+import com.example.carrental_fe.screen.user.CarCard
+import com.example.carrental_fe.screen.user.TopTitle
 import kotlin.compareTo
 import kotlin.text.compareTo
 
 @Composable
-fun SearchScreen(viewModel: SearchScreenViewModel = viewModel(factory = SearchScreenViewModel.Factory) )
+fun SearchScreen(
+    onNavigateToCarDetail: (String) -> Unit,
+    viewModel: SearchScreenViewModel = viewModel(factory = SearchScreenViewModel.Factory) )
 {
     LaunchedEffect(Unit) {
         viewModel.resetSearchScreen()
@@ -137,7 +137,9 @@ fun SearchScreen(viewModel: SearchScreenViewModel = viewModel(factory = SearchSc
                             car = car,
                             isFavorite = favourtiteCars.any { it.id == car.id },
                             onFavoriteClick = { viewModel.toggleFavourite(car.id) },
-                            onCarCardClick = { }
+                            onCarCardClick = {
+                                onNavigateToCarDetail(car.id)
+                            }
                         )
                     }
                 }

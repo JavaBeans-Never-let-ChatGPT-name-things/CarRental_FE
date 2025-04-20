@@ -28,7 +28,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,10 +41,17 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
+import com.example.carrental_fe.screen.user.BrandLogoCard
+import com.example.carrental_fe.screen.user.CarCard
+import com.example.carrental_fe.screen.user.SearchBar
+import com.example.carrental_fe.screen.user.TopTitle
+import kotlin.compareTo
+import kotlin.text.compareTo
 
 @Composable
 fun HomeScreen(
     onNavigateToSearchScreen: () -> Unit,
+    onNavigateToCarDetail: (String) -> Unit,
     viewModel: UserHomeScreenViewModel = viewModel(factory = UserHomeScreenViewModel.Factory),
 ) {
 
@@ -69,27 +75,8 @@ fun HomeScreen(
     LaunchedEffect(selectedBrand) {
         listState.animateScrollToItem(0)
     }
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP) {
-                viewModel.storeHomeScreenState()
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-    LaunchedEffect(true) {
-        if (viewModel.shouldResetPage()) {
-            viewModel.resetPage()
-        }
-    }
     LaunchedEffect(Unit) {
-        if (currentPage != 1 || selectedBrand != null){
-            viewModel.resetPage()
-        }
+        viewModel.resetPage()
     }
     Column(
         modifier = Modifier
@@ -131,15 +118,16 @@ fun HomeScreen(
                     }
             )
         }
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) { items(carBrands) { brand ->
-            BrandLogoCard(
-                carBrand = brand,
-                isSelected = selectedBrand?.id == brand.id,
-                onBrandClick = {
-                    viewModel.loadCarsByBrand(brand)
-                }
-            )
-        }
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(carBrands) { brand ->
+                BrandLogoCard(
+                    carBrand = brand,
+                    isSelected = selectedBrand?.id == brand.id,
+                    onBrandClick = {
+                        viewModel.loadCarsByBrand(brand)
+                    }
+                )
+            }
         }
 
         Spacer(Modifier.height(16.dp))
@@ -161,9 +149,10 @@ fun HomeScreen(
                         car = car,
                         isFavorite = favourtiteCars.any { it.id == car.id },
                         onFavoriteClick = {
-                            viewModel.toggleFavourite(car.id)
-                        },
-                        onCarCardClick = { }
+                            viewModel.toggleFavourite(car.id) },
+                        onCarCardClick = {
+                            onNavigateToCarDetail(car.id)
+                        }
                     )
                 }
             }

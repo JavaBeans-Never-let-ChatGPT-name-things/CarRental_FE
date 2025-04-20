@@ -34,12 +34,21 @@ class SearchScreenViewModel (private val carRepository: CarRepository) : ViewMod
         _currentPage.value = 1
         _totalPages.value = 0
         _cars.value = emptyList()
+        loadFavouriteCar()
     }
     fun setCurrentPage() {
         _currentPage.value = 1
     }
     fun setSearchQuery(query: String) {
         _query.value = query
+    }
+    fun loadFavouriteCar(){
+        viewModelScope.launch {
+            val response = carRepository.getFavourites()
+            if (response.isSuccessful) {
+                _favouriteCars.value = response.body() ?: emptyList()
+            }
+        }
     }
     fun getCars(){
         if (query.value.isEmpty())

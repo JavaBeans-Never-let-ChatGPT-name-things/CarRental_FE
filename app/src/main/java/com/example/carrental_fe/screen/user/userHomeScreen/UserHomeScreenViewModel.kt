@@ -40,14 +40,14 @@ class UserHomeScreenViewModel (private val carRepository: CarRepository) : ViewM
         loadCars()
         loadFavourites()
     }
-    fun loadCarBrands(){
+    fun loadCarBrands() {
         viewModelScope.launch {
             val response = carRepository.getCarBrands()
             if (response.isSuccessful) {
                 _carBrands.value = response.body() ?: emptyList()
             }
             val count = carRepository.getCount().body() ?: 1L
-            _totalPages.value = ((count +9) /10).toInt()
+            _totalPages.value = ((count + 9) / 10).toInt()
         }
     }
     fun loadCarsByBrand(brand: CarBrand)
@@ -63,7 +63,7 @@ class UserHomeScreenViewModel (private val carRepository: CarRepository) : ViewM
                 sortByColumn = "id"
             )
             val response = carRepository.getCarPageByBrand(request, brand.id)
-            if (response.isSuccessful){
+            if (response.isSuccessful) {
                 _cars.value = response.body() ?: emptyList()
             }
         }
@@ -81,18 +81,18 @@ class UserHomeScreenViewModel (private val carRepository: CarRepository) : ViewM
             }
         }
     }
-    fun goToPage(page : Int){
-        if(page in 1..totalPages.value){
+    fun goToPage(page: Int) {
+        if (page in 1..totalPages.value) {
             _currentPage.value = page
-            if(selectedBrand.value != null){
+            if (selectedBrand.value != null) {
                 val request = CarPageRequestDTO(
-                    pageNo = currentPage.value -1,
+                    pageNo = currentPage.value - 1,
                     sort = "ASC",
                     sortByColumn = "id"
                 )
                 viewModelScope.launch {
-                    val response = carRepository.getCarPageByBrand(request,selectedBrand.value!!.id)
-                    if(response.isSuccessful){
+                    val response = carRepository.getCarPageByBrand(request, selectedBrand.value!!.id)
+                    if (response.isSuccessful) {
                         _cars.value = response.body() ?: emptyList()
                     }
                 }
@@ -100,26 +100,27 @@ class UserHomeScreenViewModel (private val carRepository: CarRepository) : ViewM
         }
     }
     fun resetPage(){
-        _currentPage.value =1
+        _currentPage.value = 1
         _selectedBrand.value = null
         viewModelScope.launch {
             val count = carRepository.getCount().body() ?: 1L
-            _totalPages.value = ((count +9) /10).toInt()
+            _totalPages.value = ((count + 9) / 10).toInt()
         }
         loadCars()
+        loadFavourites()
     }
-    fun toggleFavourite(carId : String){
+    fun toggleFavourite(carId: String) {
         viewModelScope.launch {
-            try{
+            try {
                 val response = carRepository.updateFavourite(carId)
                 val currentFavourites = _favouriteCars.value.toMutableList()
                 val index = currentFavourites.indexOfFirst { it.id == carId }
                 if (response.message == "Favourite car updated successfully")
                 {
-                    if(index >= 0 ){
+                    if (index >= 0) {
                         currentFavourites.removeAt(index)
                     } else {
-                        val car = _cars.value.find{ it.id == carId}
+                        val car = _cars.value.find { it.id == carId }
                         if (car != null) {
                             currentFavourites.add(car)
                         }
@@ -127,32 +128,20 @@ class UserHomeScreenViewModel (private val carRepository: CarRepository) : ViewM
                     _favouriteCars.value = currentFavourites
 
                 }
-            } catch (e : Exception){
+            } catch (e: Exception) {
             }
         }
     }
     fun loadFavourites() {
         viewModelScope.launch {
-            try{
+            try {
                 val response = carRepository.getFavourites()
-                if(response.isSuccessful){
+                if (response.isSuccessful) {
                     _favouriteCars.value = response.body() ?: emptyList()
                 }
-            } catch(e: Exception){
+            } catch (e: Exception) {
             }
         }
-    }
-    private var shouldReset = false
-
-    fun storeHomeScreenState() {
-        shouldReset = true
-    }
-
-    fun shouldResetPage(): Boolean {
-        return if (shouldReset) {
-            shouldReset = false
-            true
-        } else false
     }
     fun nextPage() = goToPage(currentPage.value + 1)
     fun prevPage() = goToPage(currentPage.value - 1)

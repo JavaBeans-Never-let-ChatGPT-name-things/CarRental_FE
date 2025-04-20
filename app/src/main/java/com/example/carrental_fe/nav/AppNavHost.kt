@@ -4,20 +4,17 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.carrental_fe.dto.response.TokenResponse
-import com.example.carrental_fe.screen.UserRoute
 import com.example.carrental_fe.screen.forgot.ForgotPasswordScreen
 import com.example.carrental_fe.screen.login.LoginScreen
 import com.example.carrental_fe.screen.resetPassword.ResetPasswordScreen
 import com.example.carrental_fe.screen.signup.RegisterScreen
+import com.example.carrental_fe.screen.user.UserRoute
 import com.example.carrental_fe.screen.user.userSearchScreen.SearchScreen
-import com.example.carrental_fe.screen.userEditProfile.EditProfileScreen
-import com.example.carrental_fe.screen.userSearchScreen.SearchScreen
 import com.example.carrental_fe.screen.verify.VerifyAccountScreen
 import kotlinx.serialization.Serializable
 @Serializable
@@ -116,21 +113,12 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
             onNavigateToSearchScreen = {navController.navigate(route = Search) {
                 popUpTo(route = User) { inclusive = false }
             }},
-            onNavigateToEditProfile = {
-                navController.navigate(route = com.example.carrental_fe.nav.EditProfile) {
-                    popUpTo(route = com.example.carrental_fe.nav.User) { inclusive = false }
-                    launchSingleTop = true
-                }
-            },
         ) }
         composable<Admin> {  }
         composable <Search> {
             SearchScreen()
         }
         composable <EditProfile> {
-            EditProfileScreen(
-                onBackNav = { navController.popBackStack()},
-            )
         }
     }
 }

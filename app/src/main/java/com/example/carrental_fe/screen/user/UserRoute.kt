@@ -22,8 +22,7 @@ import com.example.carrental_fe.nav.defaultRoute
 
 @Composable
 fun UserRoute(
-    onNavigateToSearchScreen: () -> Unit,
-    onNavigateToEditProfile: () -> Unit,
+    onNavigateToSearchScreen: () -> Unit
 )
 {
     var currentRoute by rememberSaveable { mutableStateOf(defaultRoute) }
@@ -62,7 +61,6 @@ fun UserRoute(
             innerPadding ->
         UserScreenNavGraph(
             onNavigateToSearchScreen = onNavigateToSearchScreen,
-            onNavigateToEditProfile = onNavigateToEditProfile,
             currentRoute = currentRoute,
             modifier = Modifier.padding(innerPadding)
         )

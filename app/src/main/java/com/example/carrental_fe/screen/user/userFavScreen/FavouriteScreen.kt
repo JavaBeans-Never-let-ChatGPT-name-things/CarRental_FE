@@ -26,12 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.user.userHomeScreen.CarCard
-import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
-import com.example.carrental_fe.screen.user.userHomeScreen.UserHomeScreenViewModel
+import com.example.carrental_fe.screen.user.CarCard
+import com.example.carrental_fe.screen.user.TopTitle
 
 @Composable
-fun FavouriteScreen(viewModel: FavouriteScreenViewModel = viewModel(factory = FavouriteScreenViewModel.Factory))
+fun FavouriteScreen(
+    onNavigateToCarDetail: (String) -> Unit,
+    viewModel: FavouriteScreenViewModel = viewModel(factory = FavouriteScreenViewModel.Factory))
 {
     LaunchedEffect(Unit) {
         viewModel.resetFavourite()
@@ -72,7 +73,9 @@ fun FavouriteScreen(viewModel: FavouriteScreenViewModel = viewModel(factory = Fa
                         car = car,
                         isFavorite = favouriteCars.any { it.id == car.id },
                         onFavoriteClick = { viewModel.toggleFavouriteInFavScreen(car.id) },
-                        onCarCardClick = { }
+                        onCarCardClick = {
+                            onNavigateToCarDetail(car.id)
+                        }
                     )
                 }
             }
