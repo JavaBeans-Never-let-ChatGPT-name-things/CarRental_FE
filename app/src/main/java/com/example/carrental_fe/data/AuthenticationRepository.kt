@@ -16,4 +16,5 @@ interface AuthenticationRepository{
     suspend fun forgot(emailRequest: EmailRequest) : MessageResponse
     suspend fun reset(forgotPasswordRequest: ResetPasswordRequest) : MessageResponse
     suspend fun resendForgot(emailRequest: EmailRequest) : MessageResponse
+    suspend fun refresh(token: String): TokenResponse
 }

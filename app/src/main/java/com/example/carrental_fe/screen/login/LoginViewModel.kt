@@ -34,6 +34,24 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState
+    init{
+        viewModelScope.launch {
+            val refreshToken = tokenManager.getRefreshToken()
+            if (!refreshToken.isNullOrBlank()) {
+                try {
+                    val response = authenticationRepository.refresh("Bearer $refreshToken")
+                    tokenManager.saveTokens(
+                        response.accessToken,
+                        response.refreshToken,
+                        response.role
+                    )
+                    _loginState.value = LoginState.Success(response)
+                } catch (e: Exception) {
+                    _loginState.value = LoginState.Idle
+                }
+            }
+        }
+    }
     fun resetState() {
         _loginState.value = LoginState.Idle
     }

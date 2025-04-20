@@ -51,7 +51,6 @@ import kotlin.text.compareTo
 @Composable
 fun HomeScreen(
     onNavigateToSearchScreen: () -> Unit,
-    onNavigateToCarDetail: (String) -> Unit,
     viewModel: UserHomeScreenViewModel = viewModel(factory = UserHomeScreenViewModel.Factory),
 ) {
 
@@ -68,7 +67,7 @@ fun HomeScreen(
     val cars by viewModel.carList.collectAsState()
     val totalPages by viewModel.totalPages.collectAsState()
     val currentPage by viewModel.currentPage.collectAsState()
-    val favourtiteCars by viewModel.favouriteCars.collectAsState()
+    val favouriteCars by viewModel.favouriteCars.collectAsState()
     LaunchedEffect(currentPage) {
         listState.animateScrollToItem(0)
     }
@@ -147,12 +146,10 @@ fun HomeScreen(
                 items(cars) { car ->
                     CarCard(
                         car = car,
-                        isFavorite = favourtiteCars.any { it.id == car.id },
+                        isFavorite = favouriteCars.any { it.id == car.id },
                         onFavoriteClick = {
                             viewModel.toggleFavourite(car.id) },
-                        onCarCardClick = {
-                            onNavigateToCarDetail(car.id)
-                        }
+                        onCarCardClick = { }
                     )
                 }
             }

@@ -31,7 +31,6 @@ import com.example.carrental_fe.screen.user.TopTitle
 
 @Composable
 fun FavouriteScreen(
-    onNavigateToCarDetail: (String) -> Unit,
     viewModel: FavouriteScreenViewModel = viewModel(factory = FavouriteScreenViewModel.Factory))
 {
     LaunchedEffect(Unit) {
@@ -73,9 +72,7 @@ fun FavouriteScreen(
                         car = car,
                         isFavorite = favouriteCars.any { it.id == car.id },
                         onFavoriteClick = { viewModel.toggleFavouriteInFavScreen(car.id) },
-                        onCarCardClick = {
-                            onNavigateToCarDetail(car.id)
-                        }
+                        onCarCardClick = { }
                     )
                 }
             }

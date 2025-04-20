@@ -78,8 +78,7 @@ internal fun UserScreenNavGraph (
     ){
         when (it){
             MainRoutes.HOME -> {
-                HomeScreen(
-                    onNavigateToSearchScreen = onNavigateToSearchScreen)
+                HomeScreen(onNavigateToSearchScreen = onNavigateToSearchScreen)
             }
             MainRoutes.FAV_CAR -> {
                 FavouriteScreen()

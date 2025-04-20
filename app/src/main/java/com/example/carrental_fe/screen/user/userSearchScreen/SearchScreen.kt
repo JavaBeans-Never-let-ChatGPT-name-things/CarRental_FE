@@ -49,12 +49,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
 import com.example.carrental_fe.screen.user.CarCard
 import com.example.carrental_fe.screen.user.TopTitle
-import kotlin.compareTo
-import kotlin.text.compareTo
 
 @Composable
 fun SearchScreen(
-    onNavigateToCarDetail: (String) -> Unit,
     viewModel: SearchScreenViewModel = viewModel(factory = SearchScreenViewModel.Factory) )
 {
     LaunchedEffect(Unit) {
@@ -65,7 +62,7 @@ fun SearchScreen(
     val cars by viewModel.carList.collectAsState()
     val query by viewModel.query.collectAsState()
     val currentPage by viewModel.currentPage.collectAsState()
-    val favourtiteCars by viewModel.favouriteCars.collectAsState()
+    val favouriteCars by viewModel.favouriteCars.collectAsState()
     val totalPage by viewModel.totalPages.collectAsState()
     LaunchedEffect(Unit) {
         showContent = true
@@ -135,11 +132,9 @@ fun SearchScreen(
                     items(cars) { car ->
                         CarCard(
                             car = car,
-                            isFavorite = favourtiteCars.any { it.id == car.id },
+                            isFavorite = favouriteCars.any { it.id == car.id },
                             onFavoriteClick = { viewModel.toggleFavourite(car.id) },
-                            onCarCardClick = {
-                                onNavigateToCarDetail(car.id)
-                            }
+                            onCarCardClick = {}
                         )
                     }
                 }

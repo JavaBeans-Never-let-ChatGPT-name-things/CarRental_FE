@@ -39,7 +39,8 @@ import androidx.compose.ui.unit.sp
 import com.example.carrental_fe.R
 
 @Composable
-fun InputField(value:String, placeHolder:String, onValueChange:(String) -> Unit, modifier: Modifier = Modifier){
+fun InputField(value:String, placeHolder:String, onValueChange:(String) -> Unit, modifier: Modifier = Modifier
+, editable: Boolean = true) {
     TextField(
         value = value,
         onValueChange = { onValueChange(it) },
@@ -49,6 +50,7 @@ fun InputField(value:String, placeHolder:String, onValueChange:(String) -> Unit,
             .padding(horizontal = 8.dp, vertical = 4.dp),
         placeholder = { Text(placeHolder, color = Color.LightGray) },
         singleLine = true,
+        readOnly = !editable,
         textStyle = TextStyle(color = Color.Gray, fontSize = 16.sp),
         colors = TextFieldDefaults.colors(
             unfocusedContainerColor = Color(0xFFF7F7F9),
@@ -67,7 +69,6 @@ fun PasswordField(value: String,
                   onValueChange: (String) -> Unit,
                   modifier: Modifier = Modifier)
 {
-
     TextField(
         value = value,
         onValueChange = { onValueChange(it) },
@@ -77,6 +78,7 @@ fun PasswordField(value: String,
             .padding(horizontal = 8.dp, vertical = 4.dp),
         placeholder = { Text("Password", color = Color.Gray) },
         singleLine = true,
+        textStyle = TextStyle(color = Color.Gray, fontSize = 16.sp),
         visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
             val icon = if (isPasswordVisible) R.drawable.eye else R.drawable.eye_slash
@@ -104,13 +106,14 @@ fun CustomButton(
     backgroundColor: Color,
     text: String,
     @DrawableRes imageResId: Int? = null,
-    textColor: Long
+    textColor: Long,
+    modifier: Modifier = Modifier
 ) {
     Button(
         onClick = { onClickChange() },
         colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
     ) {
@@ -142,10 +145,11 @@ fun CustomButton(
 @Composable
 fun BackButton(
     onClick: () -> Unit,
-    iconResId: Int
+    iconResId: Int,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(44.dp)
             .clip(CircleShape)
             .background(Color(0xFFF7F7F9))
