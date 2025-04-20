@@ -26,9 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.userHomeScreen.CarCard
-import com.example.carrental_fe.screen.userHomeScreen.TopTitle
-import com.example.carrental_fe.screen.userHomeScreen.UserHomeScreenViewModel
+import com.example.carrental_fe.screen.user.userHomeScreen.CarCard
+import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
+import com.example.carrental_fe.screen.user.userHomeScreen.UserHomeScreenViewModel
 
 @Composable
 fun FavouriteScreen(viewModel: FavouriteScreenViewModel = viewModel(factory = FavouriteScreenViewModel.Factory))
