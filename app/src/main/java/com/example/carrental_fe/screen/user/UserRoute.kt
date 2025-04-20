@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen
+package com.example.carrental_fe.screen.user
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -18,17 +18,20 @@ import androidx.compose.ui.res.stringResource
 import com.example.carrental_fe.nav.MainRoutes
 import com.example.carrental_fe.nav.UserScreenNavGraph
 import com.example.carrental_fe.nav.defaultRoute
-import com.example.carrental_fe.screen.user.UserHomeScreenViewModel
+
 
 @Composable
 fun UserRoute(
     onNavigateToSearchScreen: () -> Unit,
-    viewModel: UserHomeScreenViewModel
+    onNavigateToEditProfile: () -> Unit,
 )
 {
     var currentRoute by rememberSaveable { mutableStateOf(defaultRoute) }
     Scaffold (
-        bottomBar = { NavigationBar {
+        containerColor = Color(0xFFFFFFFF),
+        bottomBar = { NavigationBar(
+            containerColor = Color(0xFFF7F7F9)
+        ){
             for (route in MainRoutes.entries) {
                 val isSelected = route == currentRoute
                 val iconRes = if (isSelected) route.selectedIcon
@@ -59,7 +62,7 @@ fun UserRoute(
             innerPadding ->
         UserScreenNavGraph(
             onNavigateToSearchScreen = onNavigateToSearchScreen,
-            viewModel = viewModel,
+            onNavigateToEditProfile = onNavigateToEditProfile,
             currentRoute = currentRoute,
             modifier = Modifier.padding(innerPadding)
         )
