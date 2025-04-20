@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.user
+package com.example.carrental_fe.screen.user.userSearchScreen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -46,22 +46,21 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
+import com.example.carrental_fe.screen.user.userHomeScreen.CarCard
+import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
+import com.example.carrental_fe.screen.user.userHomeScreen.UserHomeScreenViewModel
+import kotlin.compareTo
+import kotlin.text.compareTo
 
 @Composable
-fun SearchScreen(viewModel: UserHomeScreenViewModel )
+fun SearchScreen(viewModel: SearchScreenViewModel = viewModel(factory = SearchScreenViewModel.Factory) )
 {
     LaunchedEffect(Unit) {
         viewModel.resetSearchScreen()
     }
     val listState = rememberLazyListState()
-    val isAtBottom by remember {
-        derivedStateOf {
-            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
-            val totalItemsCount = listState.layoutInfo.totalItemsCount
-            lastVisibleItem?.index == totalItemsCount - 1
-        }
-    }
     var showContent by remember { mutableStateOf(false) }
     val cars by viewModel.carList.collectAsState()
     val query by viewModel.query.collectAsState()
@@ -73,6 +72,9 @@ fun SearchScreen(viewModel: UserHomeScreenViewModel )
     }
     LaunchedEffect(currentPage) {
         listState.animateScrollToItem(0)
+    }
+    LaunchedEffect(query){
+        viewModel.setCurrentPage()
     }
     AnimatedVisibility(
         visible = showContent,
@@ -121,14 +123,15 @@ fun SearchScreen(viewModel: UserHomeScreenViewModel )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .weight(1f)
+                    .padding(bottom = 8.dp)
             ) {
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    state = listState) {
+                    state = listState
+                ) {
                     items(cars) { car ->
                         CarCard(
                             car = car,
@@ -138,8 +141,7 @@ fun SearchScreen(viewModel: UserHomeScreenViewModel )
                         )
                     }
                 }
-
-                if (isAtBottom && cars.isNotEmpty()) {
+                if (cars.isNotEmpty()) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

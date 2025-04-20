@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.user
+package com.example.carrental_fe.screen.user.userHomeScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,14 +20,15 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.getValue
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,12 +40,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
 
 @Composable
 fun HomeScreen(
     onNavigateToSearchScreen: () -> Unit,
-    viewModel: UserHomeScreenViewModel
+    viewModel: UserHomeScreenViewModel = viewModel(factory = UserHomeScreenViewModel.Factory),
 ) {
 
     val listState = rememberLazyListState()
@@ -129,7 +131,7 @@ fun HomeScreen(
                     }
             )
         }
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {items(carBrands) { brand ->
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) { items(carBrands) { brand ->
             BrandLogoCard(
                 carBrand = brand,
                 isSelected = selectedBrand?.id == brand.id,
@@ -159,7 +161,8 @@ fun HomeScreen(
                         car = car,
                         isFavorite = favourtiteCars.any { it.id == car.id },
                         onFavoriteClick = {
-                            viewModel.toggleFavourite(car.id) },
+                            viewModel.toggleFavourite(car.id)
+                        },
                         onCarCardClick = { }
                     )
                 }

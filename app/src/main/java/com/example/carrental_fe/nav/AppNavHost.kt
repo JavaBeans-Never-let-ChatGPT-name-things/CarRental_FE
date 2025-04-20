@@ -15,11 +15,11 @@ import com.example.carrental_fe.screen.forgot.ForgotPasswordScreen
 import com.example.carrental_fe.screen.login.LoginScreen
 import com.example.carrental_fe.screen.resetPassword.ResetPasswordScreen
 import com.example.carrental_fe.screen.signup.RegisterScreen
-import com.example.carrental_fe.screen.user.SearchScreen
-import com.example.carrental_fe.screen.user.UserHomeScreenViewModel
+import com.example.carrental_fe.screen.user.userSearchScreen.SearchScreen
+import com.example.carrental_fe.screen.userEditProfile.EditProfileScreen
+import com.example.carrental_fe.screen.userSearchScreen.SearchScreen
 import com.example.carrental_fe.screen.verify.VerifyAccountScreen
 import kotlinx.serialization.Serializable
-
 @Serializable
 object Login
 
@@ -44,10 +44,12 @@ data object Admin
 @Serializable
 object Search
 
+@Serializable
+object EditProfile
+
 @Composable
 fun AppNavHost (navController: NavHostController = rememberNavController())
 {
-    val homeScreenViewModel: UserHomeScreenViewModel = viewModel(factory = UserHomeScreenViewModel.Factory)
     NavHost(navController = navController,
         enterTransition = { slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth }) + fadeIn() },
         popEnterTransition = { slideInHorizontally(initialOffsetX = { fullWidth -> -fullWidth }) + fadeIn() },
@@ -60,9 +62,9 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                 onSignUpNav = { navController.navigate(route = SignUp) },
                 onRecoveryNav =  { navController.navigate(route = ForgotPassword) },
                 onLoginSuccessNav = {
-                        token -> navController.navigate(route = if (token.role == "ADMIN") Admin else User){
-                    popUpTo(route = Login)
-                }
+                    token -> navController.navigate(route = if (token.role == "ADMIN") Admin else User){
+                            popUpTo(route = Login)
+                    }
                 }
             )
         }
@@ -71,10 +73,10 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                 onBackNav = { navController.popBackStack() },
                 onLoginNav = { navController.popBackStack() },
                 onRegisterSuccessNav = {
-                        email -> navController.navigate(route = VerifyAccount(email)){
-                    popUpTo(SignUp) { inclusive = true }
-                    launchSingleTop = true
-                }
+                    email -> navController.navigate(route = VerifyAccount(email)){
+                        popUpTo(SignUp) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -114,11 +116,21 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
             onNavigateToSearchScreen = {navController.navigate(route = Search) {
                 popUpTo(route = User) { inclusive = false }
             }},
-            viewModel = homeScreenViewModel
+            onNavigateToEditProfile = {
+                navController.navigate(route = com.example.carrental_fe.nav.EditProfile) {
+                    popUpTo(route = com.example.carrental_fe.nav.User) { inclusive = false }
+                    launchSingleTop = true
+                }
+            },
         ) }
         composable<Admin> {  }
         composable <Search> {
-            SearchScreen(viewModel = homeScreenViewModel)
+            SearchScreen()
+        }
+        composable <EditProfile> {
+            EditProfileScreen(
+                onBackNav = { navController.popBackStack()},
+            )
         }
     }
 }
