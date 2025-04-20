@@ -22,9 +22,13 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.user.HomeScreen
-import com.example.carrental_fe.screen.user.UserHomeScreenViewModel
+import com.example.carrental_fe.model.Account
+import com.example.carrental_fe.screen.userFavScreen.FavouriteScreen
+import com.example.carrental_fe.screen.userHomeScreen.HomeScreen
+import com.example.carrental_fe.screen.userHomeScreen.UserHomeScreenViewModel
+import com.example.carrental_fe.screen.userProfile.ProfileScreen
 
 internal val defaultRoute = MainRoutes.HOME
 
@@ -62,7 +66,6 @@ internal enum class MainRoutes(
 @Composable
 internal fun UserScreenNavGraph (
     onNavigateToSearchScreen: () -> Unit,
-    viewModel: UserHomeScreenViewModel,
     currentRoute: MainRoutes,
     modifier: Modifier = Modifier
 ){
@@ -79,11 +82,10 @@ internal fun UserScreenNavGraph (
         when (it){
             MainRoutes.HOME -> {
                 HomeScreen(
-                    viewModel = viewModel,
                     onNavigateToSearchScreen = onNavigateToSearchScreen)
             }
             MainRoutes.FAV_CAR -> {
-
+                FavouriteScreen()
             }
 
             MainRoutes.CONTRACTS -> {
@@ -91,6 +93,7 @@ internal fun UserScreenNavGraph (
             MainRoutes.NOTIFICATIONS -> {
             }
             MainRoutes.PROFILE -> {
+                ProfileScreen(onNavigateToEditProfile = onNavigateToEditProfile)
             }
         }
     }
