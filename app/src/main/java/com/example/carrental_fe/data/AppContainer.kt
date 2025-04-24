@@ -1,18 +1,21 @@
 package com.example.carrental_fe.data
 
 import android.content.Context
+import com.example.carrental_fe.network.AccountApi
 import com.example.carrental_fe.network.AuthApi
 import com.example.carrental_fe.network.CarApi
+import com.example.carrental_fe.network.PayOsApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 
 interface AppContainer {
     val authenticationRepository: AuthenticationRepository
     val carRepository: CarRepository
+    val accountRepository: AccountRepository
+    val payOsRepository: PayOsRepository
 }
 
 class DefaultAppContainer(context: Context) : AppContainer {
@@ -37,6 +40,8 @@ class DefaultAppContainer(context: Context) : AppContainer {
         .build()
 
     private val carApi: CarApi = updatedRetrofit.create(CarApi::class.java)
+    private val accountApi: AccountApi = updatedRetrofit.create(AccountApi::class.java)
+    private val payOsApi: PayOsApi = updatedRetrofit.create(PayOsApi::class.java)
 
     override val authenticationRepository: AuthenticationRepository by lazy {
         AuthenticationRepositoryImpl(authApi)
@@ -44,5 +49,11 @@ class DefaultAppContainer(context: Context) : AppContainer {
 
     override val carRepository: CarRepository by lazy {
         CarRepositoryImpl(carApi)
+    }
+    override val accountRepository: AccountRepository by lazy {
+        AccountRepositoryImpl(accountApi)
+    }
+    override val payOsRepository: PayOsRepository by lazy {
+        PayOsRepositoryImpl(payOsApi)
     }
 }
