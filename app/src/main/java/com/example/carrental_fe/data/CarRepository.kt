@@ -4,8 +4,8 @@ import com.example.carrental_fe.dto.request.CarPageRequestDTO
 import com.example.carrental_fe.dto.response.MessageResponse
 import com.example.carrental_fe.model.Car
 import com.example.carrental_fe.model.CarBrand
+import com.example.carrental_fe.model.Review
 import retrofit2.Response
-
 
 interface CarRepository {
     suspend fun getCarBrands(): Response<List<CarBrand>>
@@ -17,4 +17,6 @@ interface CarRepository {
     suspend fun getFavourites(): Response<List<Car>>
     suspend fun countFilter(carId: String): Response<Long>
     suspend fun getFilterCarPageByBrand(carPageRequestDTO: CarPageRequestDTO, carId: String): Response<List<Car>>
+    suspend fun getCarReviews(carId: String): Response<List<Review>>
+    suspend fun getCarDetail(carId: String): Response<Car>
 }

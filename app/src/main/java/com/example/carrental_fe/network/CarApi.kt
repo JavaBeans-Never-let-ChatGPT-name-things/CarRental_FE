@@ -4,6 +4,7 @@ import com.example.carrental_fe.dto.request.CarPageRequestDTO
 import com.example.carrental_fe.dto.response.MessageResponse
 import com.example.carrental_fe.model.Car
 import com.example.carrental_fe.model.CarBrand
+import com.example.carrental_fe.model.Review
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -46,4 +47,10 @@ interface CarApi {
         @Body carPageRequestDTO: CarPageRequestDTO,
         @Path("carId") carId: String
     ): Response<List<Car>>
+
+    @GET("/api/cars/reviews/{carId}")
+    suspend fun getCarReviews(@Path("carId") carId: String): Response<List<Review>>
+
+    @GET("/api/cars/{carId}")
+    suspend fun getCarDetail(@Path("carId") carId: String): Response<Car>
 }
