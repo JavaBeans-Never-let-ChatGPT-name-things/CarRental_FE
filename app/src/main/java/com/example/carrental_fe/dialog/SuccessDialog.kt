@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -28,22 +28,26 @@ import com.example.carrental_fe.R
 import com.example.carrental_fe.screen.component.CustomButton
 
 @Composable
-fun ErrorDialog(text: String = "Something’s Wrong. Try Again Later",onDismiss: () -> Unit) {
+fun SuccessDialog(text: String, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         text = {
             Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.fillMaxWidth()
-                ){
+                ) {
                     Icon(
-                        imageVector = Icons.Default.Warning,
-                        contentDescription = "Warning",
-                        tint = Color(0xFFFFC107),
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Success",
+                        tint = Color(0xFF4CAF50),
                         modifier = Modifier.size(60.dp)
                     )
                 }
@@ -51,8 +55,8 @@ fun ErrorDialog(text: String = "Something’s Wrong. Try Again Later",onDismiss:
                 Text(
                     text = text,
                     fontSize = 18.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_bold)),
-                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
+                    fontWeight = FontWeight.Medium,
                     textAlign = TextAlign.Center
                 )
             }
@@ -70,6 +74,6 @@ fun ErrorDialog(text: String = "Something’s Wrong. Try Again Later",onDismiss:
 
 @Preview
 @Composable
-fun ErrorDialogPreview() {
-    ErrorDialog(onDismiss = {})
+fun SuccessDialogPreview() {
+    SuccessDialog(text = " What da hell ", onDismiss = {})
 }
