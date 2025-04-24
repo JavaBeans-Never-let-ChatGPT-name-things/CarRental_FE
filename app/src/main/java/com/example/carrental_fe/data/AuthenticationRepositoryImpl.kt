@@ -31,6 +31,6 @@ class AuthenticationRepositoryImpl (private val authApi: AuthApi): Authenticatio
     override suspend fun resendForgot(emailRequest: EmailRequest): MessageResponse
             = authApi.resendForgot(emailRequest)
 
-    override suspend fun refresh(token: String): TokenResponse
-            = authApi.refresh(token)
+    override suspend fun refresh(refreshToken: String): TokenResponse
+            = authApi.refresh(refreshToken)
 }
