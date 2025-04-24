@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.user.userSearchScreen
+package com.example.carrental_fe.screen.userSearchScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.user.userHomeScreen
+package com.example.carrental_fe.screen.userHomeScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.user.userFavScreen
+package com.example.carrental_fe.screen.userFavScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -12,9 +12,6 @@ import com.example.carrental_fe.model.Car
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlin.collections.find
-import kotlin.collections.indexOfFirst
-import kotlin.collections.toMutableList
 
 class FavouriteScreenViewModel (private val carRepository: CarRepository) : ViewModel() {
     private val _favouriteCars = MutableStateFlow<List<Car>>(emptyList())
