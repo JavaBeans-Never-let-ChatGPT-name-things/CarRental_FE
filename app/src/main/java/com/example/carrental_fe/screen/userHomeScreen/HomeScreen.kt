@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.user.userHomeScreen
+package com.example.carrental_fe.screen.userHomeScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,16 +42,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.user.BrandLogoCard
-import com.example.carrental_fe.screen.user.CarCard
-import com.example.carrental_fe.screen.user.SearchBar
-import com.example.carrental_fe.screen.user.TopTitle
-import kotlin.compareTo
-import kotlin.text.compareTo
 
 @Composable
 fun HomeScreen(
     onNavigateToSearchScreen: () -> Unit,
+    onNavigateToCarDetail: (String) -> Unit,
     viewModel: UserHomeScreenViewModel = viewModel(factory = UserHomeScreenViewModel.Factory),
 ) {
 
@@ -67,7 +63,7 @@ fun HomeScreen(
     val cars by viewModel.carList.collectAsState()
     val totalPages by viewModel.totalPages.collectAsState()
     val currentPage by viewModel.currentPage.collectAsState()
-    val favouriteCars by viewModel.favouriteCars.collectAsState()
+    val favourtiteCars by viewModel.favouriteCars.collectAsState()
     LaunchedEffect(currentPage) {
         listState.animateScrollToItem(0)
     }
@@ -146,10 +142,12 @@ fun HomeScreen(
                 items(cars) { car ->
                     CarCard(
                         car = car,
-                        isFavorite = favouriteCars.any { it.id == car.id },
+                        isFavorite = favourtiteCars.any { it.id == car.id },
                         onFavoriteClick = {
                             viewModel.toggleFavourite(car.id) },
-                        onCarCardClick = { }
+                        onCarCardClick = {
+                            onNavigateToCarDetail(car.id)
+                        }
                     )
                 }
             }

@@ -14,5 +14,7 @@ data class Car (
     val seatsNumber: Int,
     val rentalPrice: Float,
     val engineType: String,
-    val rating: Float
+    val rating: Float,
+    val gearType: String,
+    val drive: String
 )

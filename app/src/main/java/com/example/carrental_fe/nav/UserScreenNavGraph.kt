@@ -22,10 +22,13 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.user.userFavScreen.FavouriteScreen
-import com.example.carrental_fe.screen.user.userHomeScreen.HomeScreen
-import com.example.carrental_fe.screen.user.ProfileScreen
+import com.example.carrental_fe.model.Account
+import com.example.carrental_fe.screen.userFavScreen.FavouriteScreen
+import com.example.carrental_fe.screen.userHomeScreen.HomeScreen
+import com.example.carrental_fe.screen.userHomeScreen.UserHomeScreenViewModel
+import com.example.carrental_fe.screen.userProfile.ProfileScreen
 
 internal val defaultRoute = MainRoutes.HOME
 
@@ -63,6 +66,8 @@ internal enum class MainRoutes(
 @Composable
 internal fun UserScreenNavGraph (
     onNavigateToSearchScreen: () -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToCarDetail: (carId: String) -> Unit,
     currentRoute: MainRoutes,
     modifier: Modifier = Modifier
 ){
@@ -78,10 +83,15 @@ internal fun UserScreenNavGraph (
     ){
         when (it){
             MainRoutes.HOME -> {
-                HomeScreen(onNavigateToSearchScreen = onNavigateToSearchScreen)
+                HomeScreen(
+                    onNavigateToSearchScreen = onNavigateToSearchScreen,
+                    onNavigateToCarDetail = onNavigateToCarDetail
+                )
             }
             MainRoutes.FAV_CAR -> {
-                FavouriteScreen()
+                FavouriteScreen(
+                    onNavigateToCarDetail = onNavigateToCarDetail
+                )
             }
 
             MainRoutes.CONTRACTS -> {
@@ -89,7 +99,7 @@ internal fun UserScreenNavGraph (
             MainRoutes.NOTIFICATIONS -> {
             }
             MainRoutes.PROFILE -> {
-
+                ProfileScreen(onNavigateToEditProfile = onNavigateToEditProfile)
             }
         }
     }

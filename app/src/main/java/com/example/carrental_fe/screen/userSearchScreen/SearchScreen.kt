@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.user.userSearchScreen
+package com.example.carrental_fe.screen.userSearchScreen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -47,11 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.user.CarCard
-import com.example.carrental_fe.screen.user.TopTitle
+import com.example.carrental_fe.screen.userHomeScreen.CarCard
+import com.example.carrental_fe.screen.userHomeScreen.TopTitle
 
 @Composable
 fun SearchScreen(
+    onNavigateToCarDetail: (String) -> Unit,
     viewModel: SearchScreenViewModel = viewModel(factory = SearchScreenViewModel.Factory) )
 {
     LaunchedEffect(Unit) {
@@ -62,7 +63,7 @@ fun SearchScreen(
     val cars by viewModel.carList.collectAsState()
     val query by viewModel.query.collectAsState()
     val currentPage by viewModel.currentPage.collectAsState()
-    val favouriteCars by viewModel.favouriteCars.collectAsState()
+    val favourtiteCars by viewModel.favouriteCars.collectAsState()
     val totalPage by viewModel.totalPages.collectAsState()
     LaunchedEffect(Unit) {
         showContent = true
@@ -132,9 +133,11 @@ fun SearchScreen(
                     items(cars) { car ->
                         CarCard(
                             car = car,
-                            isFavorite = favouriteCars.any { it.id == car.id },
+                            isFavorite = favourtiteCars.any { it.id == car.id },
                             onFavoriteClick = { viewModel.toggleFavourite(car.id) },
-                            onCarCardClick = {}
+                            onCarCardClick = {
+                                onNavigateToCarDetail(car.id)
+                            }
                         )
                     }
                 }

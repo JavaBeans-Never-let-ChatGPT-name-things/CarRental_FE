@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.user
+package com.example.carrental_fe.screen
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -19,10 +19,11 @@ import com.example.carrental_fe.nav.MainRoutes
 import com.example.carrental_fe.nav.UserScreenNavGraph
 import com.example.carrental_fe.nav.defaultRoute
 
-
 @Composable
 fun UserRoute(
-    onNavigateToSearchScreen: () -> Unit
+    onNavigateToSearchScreen: () -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToCarDetail: (String) -> Unit,
 )
 {
     var currentRoute by rememberSaveable { mutableStateOf(defaultRoute) }
@@ -61,6 +62,8 @@ fun UserRoute(
             innerPadding ->
         UserScreenNavGraph(
             onNavigateToSearchScreen = onNavigateToSearchScreen,
+            onNavigateToEditProfile = onNavigateToEditProfile,
+            onNavigateToCarDetail = onNavigateToCarDetail,
             currentRoute = currentRoute,
             modifier = Modifier.padding(innerPadding)
         )

@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.user.userFavScreen
+package com.example.carrental_fe.screen.userFavScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,8 +14,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,11 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.user.CarCard
-import com.example.carrental_fe.screen.user.TopTitle
+import com.example.carrental_fe.screen.userHomeScreen.CarCard
+import com.example.carrental_fe.screen.userHomeScreen.TopTitle
 
 @Composable
 fun FavouriteScreen(
+    onNavigateToCarDetail: (String) -> Unit,
     viewModel: FavouriteScreenViewModel = viewModel(factory = FavouriteScreenViewModel.Factory))
 {
     LaunchedEffect(Unit) {
@@ -72,7 +73,9 @@ fun FavouriteScreen(
                         car = car,
                         isFavorite = favouriteCars.any { it.id == car.id },
                         onFavoriteClick = { viewModel.toggleFavouriteInFavScreen(car.id) },
-                        onCarCardClick = { }
+                        onCarCardClick = {
+                            onNavigateToCarDetail(car.id)
+                        }
                     )
                 }
             }

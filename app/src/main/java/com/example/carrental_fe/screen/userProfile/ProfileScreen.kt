@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.user
+package com.example.carrental_fe.screen.userProfile
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -16,34 +16,46 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.carrental_fe.R
+import com.example.carrental_fe.model.Account
 import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.component.InputField
 import com.example.carrental_fe.screen.component.InputLabel
+import com.example.carrental_fe.screen.userHomeScreen.TopTitle
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(
+    viewModel: ProfileScreenViewModel = viewModel(factory = ProfileScreenViewModel.Factory),
+    onNavigateToEditProfile: () -> Unit) {
     val context = LocalContext.current
-
+    val accountInfo = viewModel.accountInfo.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.getAccountInfo()
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(16.dp)
     ) {
-        // Tiêu đề
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -52,7 +64,7 @@ fun ProfileScreen() {
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(), // Thêm padding nếu muốn
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
 
@@ -68,7 +80,7 @@ fun ProfileScreen() {
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .offset(x = (-13).dp)
-                        .clickable { }
+                        .clickable { onNavigateToEditProfile() }
                 )
             }
         }
@@ -76,52 +88,82 @@ fun ProfileScreen() {
         Spacer(modifier = Modifier.height(30.dp))
 
         // Avatar
-        Image(
-            painter = painterResource(id = R.drawable.male_avatar_svgrepo_com),
-            contentDescription = "Profile Image",
-            modifier = Modifier
-                .size(110.dp)
-                .clip(CircleShape)
-                .border(1.dp, Color.White, CircleShape)
-                .align(Alignment.CenterHorizontally)
-        )
-
+        if (accountInfo.value?.avatarUrl != null) {
+            AsyncImage(
+                model = accountInfo.value?.avatarUrl,
+                contentDescription = "Profile Image",
+                modifier = Modifier
+                    .size(110.dp)
+                    .clip(CircleShape)
+                    .border(1.dp, Color.White, CircleShape)
+                    .align(Alignment.CenterHorizontally),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.male_avatar_svgrepo_com),
+                error = painterResource(id = R.drawable.male_avatar_svgrepo_com)
+            )
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.male_avatar_svgrepo_com),
+                contentDescription = "Default Profile Image",
+                modifier = Modifier
+                    .size(110.dp)
+                    .clip(CircleShape)
+                    .border(1.dp, Color.White, CircleShape)
+                    .align(Alignment.CenterHorizontally),
+                contentScale = ContentScale.Crop
+            )
+        }
         // Tên
         Spacer(modifier = Modifier.height(30.dp))
         InputLabel("Your Name", R.drawable.user)
-        InputField("Sherlock Holmes", "hihi", {})
+        InputField(
+            placeHolder = "Complete your name",
+            value = accountInfo.value?.displayName ?: "",
+            onValueChange = {},
+            editable = false
+        )
 
 
         // Email
         Spacer(modifier = Modifier.height(16.dp))
         InputLabel("Email Address", R.drawable.email)
-        InputField("sherlockholmes@gmail.com", "hihi", {})
+        InputField(
+            placeHolder = "Complete your email address",
+            value = accountInfo.value?.email ?: "",
+            onValueChange = {},
+            editable = false)
 
         // Địa chỉ
         Spacer(modifier = Modifier.height(16.dp))
         InputLabel("Address", R.drawable.house_24px)
-        InputField("221B Baker Street", "hihi", {})
+        InputField(
+            placeHolder = "Complete your address",
+            value = accountInfo.value?.address ?: "",
+            onValueChange = {},
+            editable = false)
 
         // Số điện thoại
         Spacer(modifier = Modifier.height(16.dp))
         InputLabel("Phone Number", R.drawable.phone_number)
-        InputField("0908070605", "hihi", {})
+        InputField(
+            placeHolder = "Complete your phone number",
+            value = accountInfo.value?.phoneNumber ?: "",
+            onValueChange = {},
+            editable = false)
 
-
-        // Change Password
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Change Password",
             fontSize = 14.sp,
-            color = Color.Blue,
+            color = Color(0xFF0D6EFD),
             modifier = Modifier
                 .align(Alignment.End)
                 .clickable {
-                    Toast.makeText(context, "Change Password clicked", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Change Password clicked", Toast.LENGTH_SHORT)
+                        .show()
                 }
         )
 
-        // Nút Log Out
         Spacer(modifier = Modifier.height(24.dp))
         CustomButton(
             backgroundColor = Color(0xFF0D6EFD),
@@ -130,10 +172,4 @@ fun ProfileScreen() {
             onClickChange = {}
         )
     }
-}
-
-@Preview
-@Composable
-fun verjvethg() {
-    ProfileScreen();
 }

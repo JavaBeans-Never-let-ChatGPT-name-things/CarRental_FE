@@ -4,6 +4,7 @@ import com.example.carrental_fe.dto.request.CarPageRequestDTO
 import com.example.carrental_fe.dto.response.MessageResponse
 import com.example.carrental_fe.model.Car
 import com.example.carrental_fe.model.CarBrand
+import com.example.carrental_fe.model.Review
 import com.example.carrental_fe.network.CarApi
 import retrofit2.Response
 
@@ -40,4 +41,10 @@ class CarRepositoryImpl (private val carApi: CarApi): CarRepository {
         carId: String
     ): Response<List<Car>>
             = carApi.getFilterCarPageByBrand(carPageRequestDTO, carId)
+
+    override suspend fun getCarReviews(carId: String): Response<List<Review>>
+            = carApi.getCarReviews(carId)
+
+    override suspend fun getCarDetail(carId: String): Response<Car>
+            = carApi.getCarDetail(carId)
 }

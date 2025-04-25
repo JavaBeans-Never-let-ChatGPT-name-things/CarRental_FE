@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.user
+package com.example.carrental_fe.screen.userHomeScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,6 +47,7 @@ import coil.compose.AsyncImage
 import com.example.carrental_fe.R
 import com.example.carrental_fe.model.Car
 import com.example.carrental_fe.model.CarBrand
+import com.example.carrental_fe.model.enums.CarState
 
 @Composable
 fun CarCard(
@@ -63,7 +64,7 @@ fun CarCard(
             .padding(16.dp)
             .width(372.dp)
             .clickable{
-                onCarCardClick()
+                if(car.state == CarState.AVAILABLE) onCarCardClick()
             }
     ) {
         Column {
@@ -99,15 +100,51 @@ fun CarCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            AsyncImage(
-                model = car.carImageUrl,
-                contentDescription = "Car image",
+            Box(
                 modifier = Modifier
                     .width(300.dp)
                     .height(110.dp)
-                    .align(Alignment.CenterHorizontally),
-                contentScale = ContentScale.Fit
-            )
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                AsyncImage(
+                    model = car.carImageUrl,
+                    contentDescription = "Car image",
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+
+                if (car.state != CarState.AVAILABLE) {
+                    val overlayText = when (car.state) {
+                        CarState.RENTED -> "Currently Rented"
+                        CarState.UNDER_MAINTENANCE -> "Under Maintenance"
+                        else -> ""
+                    }
+
+                    val overlayTextColor = when (car.state) {
+                        CarState.RENTED -> Color(0xFFFFD700) // vàng đậm
+                        CarState.UNDER_MAINTENANCE -> Color(0xFFD32F2F) // đỏ đậm
+                        else -> Color.Black
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = overlayText,
+                            color = overlayTextColor,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 30.sp,
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                letterSpacing = 1.sp
+                            )
+                        )
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -205,7 +242,7 @@ fun SearchBar(
     }
 }
 @Composable
-fun TopTitle(title: String, modifier: Modifier = Modifier )
+fun TopTitle(title: String, modifier: Modifier = Modifier)
 {
     Box(
         modifier = Modifier.fillMaxWidth(),
@@ -230,9 +267,8 @@ fun TopTitle(title: String, modifier: Modifier = Modifier )
         }
     }
 }
-
-@Preview()
 @Composable
-fun Preview() {
-
+@Preview
+fun CarCardPreview(){
+    SearchBar("") {}
 }

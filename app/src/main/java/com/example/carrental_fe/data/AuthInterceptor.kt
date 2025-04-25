@@ -1,9 +1,13 @@
 package com.example.carrental_fe.data
 
+import android.util.Log
 import com.example.carrental_fe.network.AuthApi
 import kotlinx.coroutines.runBlocking
+import okhttp3.Authenticator
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response
+import okhttp3.Route
 
 class AuthInterceptor(private val tokenManager: TokenManager) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
