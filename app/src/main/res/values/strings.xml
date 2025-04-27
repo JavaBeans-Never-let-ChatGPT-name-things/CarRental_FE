@@ -5,4 +5,5 @@
     <string name="contract_screen_label">Contracts</string>
     <string name="notification_screen_label">Noti</string>
     <string name="profile_screen_label">Profile</string>
+    <string name="default_notification_channel_id">Global</string>
 </resources>

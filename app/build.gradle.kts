@@ -41,8 +41,16 @@ android {
 }
 
 dependencies {
+    //LocalDate
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+    //firebase dependencies
+    implementation ("com.google.firebase:firebase-analytics-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+    implementation("com.google.firebase:firebase-messaging:24.1.1")
+
     implementation("androidx.datastore:datastore-preferences:1.1.4")
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
+    implementation("androidx.compose.material3:material3:1.2.0")
     implementation (libs.logging.interceptor)
     //Network dependencies
     implementation(libs.retrofit2.kotlinx.serialization.converter)
@@ -65,6 +73,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.messaging.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
