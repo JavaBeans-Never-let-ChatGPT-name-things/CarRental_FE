@@ -52,11 +52,11 @@ class FirebaseService: FirebaseMessagingService() {
 
     }
     private fun sendBroadcastMessage(message: RemoteMessage.Notification) {
-        val intent = Intent("com.example.carrental_clone.NEW_MESSAGE").apply {
+        val intent = Intent("com.example.carrental_fe.NEW_MESSAGE").apply {
             putExtra("message", message.body)
             putExtra("title", message.title)
             putExtra("imageUrl", message.imageUrl.toString())
-            setPackage("com.example.carrental_clone")
+            setPackage("com.example.carrental_fe")
         }
 
         sendBroadcast(intent)
