@@ -17,3 +17,4 @@ local.properties
 /.idea/compiler.xml
 /.idea/deploymentTargetSelector.xml
 /.idea/inspectionProfiles/Project_Default.xml
+google-services.json

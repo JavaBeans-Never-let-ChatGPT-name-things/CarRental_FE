@@ -14,6 +14,10 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.carrental_fe.CarRentalApplication
 import com.example.carrental_fe.data.TokenManager
+import com.example.carrental_fe.data.NotificationRepository
+import kotlinx.coroutines.runBlocking
+import android.util.Log
+
 
 sealed class LoginState {
     object Idle : LoginState()
@@ -22,7 +26,8 @@ sealed class LoginState {
     data class Error(val message: String) : LoginState()
 }
 class LoginViewModel (private val authenticationRepository: AuthenticationRepository
-                      , private val tokenManager: TokenManager) : ViewModel() {
+                      , private val tokenManager: TokenManager,
+                      private val notificationRepository: NotificationRepository) : ViewModel() {
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
@@ -77,6 +82,7 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
             try {
+                val fcmToken = tokenManager.getDeviceToken()
                 val response = authenticationRepository.login(LoginRequest(_username.value, _password.value))
                 _loginState.value = LoginState.Success(response)
                 tokenManager.saveTokens(
@@ -84,6 +90,11 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
                     response.refreshToken,
                     response.role
                 )
+                if (fcmToken != null) {
+                    notificationRepository.registerToken(fcmToken)
+                } else {
+                    Log.d("LoginViewModel", "FCM token is null")
+                }
             } catch (e: Exception) {
                 _loginState.value = LoginState.Error(e.message ?: "Login failed")
             }
@@ -94,8 +105,10 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
             initializer {
                 val application = (this[APPLICATION_KEY] as CarRentalApplication)
                 val authenticationRepository = application.container.authenticationRepository
+                val notificationRepository = application.container.notificationRepository
                 val tokenManager = TokenManager(application)
-                LoginViewModel(authenticationRepository = authenticationRepository, tokenManager = tokenManager)
+                LoginViewModel(authenticationRepository = authenticationRepository, tokenManager = tokenManager,
+                    notificationRepository = notificationRepository)
             }
         }
     }

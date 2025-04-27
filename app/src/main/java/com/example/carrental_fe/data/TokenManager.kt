@@ -12,32 +12,41 @@ import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "tokens")
 
-class TokenManager(private val context: Context) {
-
+class TokenManager(context: Context) {
+    private val appContext = context.applicationContext
     companion object {
         val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
         val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
         val ROLE = stringPreferencesKey("role")
+        val DEVICE_TOKEN = stringPreferencesKey("device_token")
     }
 
     suspend fun saveTokens(accessToken: String, refreshToken: String, role: String) {
-        context.dataStore.edit { prefs ->
+        appContext.dataStore.edit { prefs ->
             prefs[ACCESS_TOKEN_KEY] = accessToken
             prefs[REFRESH_TOKEN_KEY] = refreshToken
             prefs[ROLE] = role
         }
     }
     suspend fun clearTokens(){
-        context.dataStore.edit {
+        appContext.dataStore.edit {
             it.clear()
         }
     }
+    suspend fun saveDeviceToken(deviceToken: String) {
+        appContext.dataStore.edit { prefs ->
+            prefs[DEVICE_TOKEN] = deviceToken
+        }
+    }
+
+    suspend fun getDeviceToken(): String? =
+        appContext.dataStore.data.map { it[DEVICE_TOKEN] }.firstOrNull()
 
     suspend fun getAccessToken(): String? =
-        context.dataStore.data.map { it[ACCESS_TOKEN_KEY] }.firstOrNull()
+        appContext.dataStore.data.map { it[ACCESS_TOKEN_KEY] }.firstOrNull()
 
     suspend fun getRefreshToken(): String? =
-        context.dataStore.data.map { it[REFRESH_TOKEN_KEY] }.firstOrNull()
+        appContext.dataStore.data.map { it[REFRESH_TOKEN_KEY] }.firstOrNull()
     suspend fun getRole(): String? =
-        context.dataStore.data.map { it[ROLE] }.firstOrNull()
+        appContext.dataStore.data.map { it[ROLE] }.firstOrNull()
 }
