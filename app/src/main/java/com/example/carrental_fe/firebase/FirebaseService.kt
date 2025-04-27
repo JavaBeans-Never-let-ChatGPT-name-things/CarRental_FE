@@ -5,26 +5,36 @@ import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_HIGH
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.app.PendingIntent.FLAG_MUTABLE
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
-import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import com.example.carrental_fe.CarRentalApplication
 import com.example.carrental_fe.MainActivity
 import com.example.carrental_fe.R
+import com.example.carrental_fe.data.TokenManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlin.random.Random
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FirebaseService: FirebaseMessagingService() {
+    private val tokenManager by lazy { TokenManager(applicationContext) }
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.d("Token Firebase", token)
-        // Handle the new token here
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                tokenManager.saveDeviceToken(token)
+                Log.d("Token Firebase", "Token saved successfully")
+            } catch (e: Exception) {
+                Log.e("Token Firebase", e.message.toString())
+            }
+        }
     }
     @RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS)
     override fun onMessageReceived(message: RemoteMessage) {

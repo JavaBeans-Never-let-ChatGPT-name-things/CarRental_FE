@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.toRoute
 import com.example.carrental_fe.CarRentalApplication
 import com.example.carrental_fe.data.AuthenticationRepository
+import com.example.carrental_fe.data.NotificationRepository
 import com.example.carrental_fe.data.TokenManager
 import com.example.carrental_fe.dto.request.EmailRequest
 import com.example.carrental_fe.dto.request.VerifyUserRequest
@@ -29,7 +30,8 @@ sealed class VerifyAccountState {
     data class Error(val message: String) : VerifyAccountState()
 }
 class VerifyAccountViewModel (private val authenticationRepository: AuthenticationRepository,
-    savedStateHandle: SavedStateHandle, private val tokenManager: TokenManager): ViewModel() {
+                              savedStateHandle: SavedStateHandle, private val tokenManager: TokenManager,
+                              private val notificationRepository: NotificationRepository): ViewModel() {
     private val _verificationCode = MutableStateFlow("")
     val verificationCode: StateFlow<String> = _verificationCode
 
@@ -65,12 +67,18 @@ class VerifyAccountViewModel (private val authenticationRepository: Authenticati
                     email.email?:"",
                     _verificationCode.value
                 ))
+                val fcmToken = tokenManager.getDeviceToken()
                 _verifyAccountState.value = com.example.carrental_fe.screen.verify.VerifyAccountState.Success(response)
                 tokenManager.saveTokens(
                     response.accessToken,
                     response.refreshToken,
                     response.role
                 )
+                if (fcmToken != null) {
+                    notificationRepository.registerToken(fcmToken)
+                } else {
+                    Log.d("LoginViewModel", "FCM token is null")
+                }
             }
             catch (e: Exception) {
                 _verifyAccountState.value = com.example.carrental_fe.screen.verify.VerifyAccountState.Error(e.message?: "An error occurred")
@@ -85,8 +93,9 @@ class VerifyAccountViewModel (private val authenticationRepository: Authenticati
                 val authenticationRepository = application.container.authenticationRepository
                 val savedStateHandle = createSavedStateHandle()
                 val tokenManager = TokenManager(application)
+                val notificationRepository = application.container.notificationRepository
                 VerifyAccountViewModel(authenticationRepository = authenticationRepository, savedStateHandle = savedStateHandle,
-                    tokenManager = tokenManager)
+                    tokenManager = tokenManager, notificationRepository = notificationRepository)
             }
         }
     }
