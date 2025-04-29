@@ -82,7 +82,7 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
             try {
-                val fcmToken = tokenManager.getDeviceToken()
+
                 val response = authenticationRepository.login(LoginRequest(_username.value, _password.value))
                 _loginState.value = LoginState.Success(response)
                 tokenManager.saveTokens(
@@ -90,13 +90,18 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
                     response.refreshToken,
                     response.role
                 )
+            } catch (e: Exception) {
+                _loginState.value = LoginState.Error(e.message ?: "Login failed")
+            }
+            try {
+                val fcmToken = tokenManager.getDeviceToken()
                 if (fcmToken != null) {
                     notificationRepository.registerToken(fcmToken)
                 } else {
                     Log.d("LoginViewModel", "FCM token is null")
                 }
             } catch (e: Exception) {
-                _loginState.value = LoginState.Error(e.message ?: "Login failed")
+                _loginState.value = LoginState.Idle
             }
         }
     }
