@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
 import com.example.carrental_fe.model.Account
+import com.example.carrental_fe.screen.userContractScreen.ContractScreen
 import com.example.carrental_fe.screen.userFavScreen.FavouriteScreen
 import com.example.carrental_fe.screen.userHomeScreen.HomeScreen
 import com.example.carrental_fe.screen.userHomeScreen.UserHomeScreenViewModel
@@ -71,6 +72,7 @@ internal fun UserScreenNavGraph (
     onNavigateToSearchScreen: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
     onNavigateToCarDetail: (carId: String) -> Unit,
+    onCheckoutNav: (String, String, Long?) -> Unit,
     currentRoute: MainRoutes,
     modifier: Modifier = Modifier
 ){
@@ -98,6 +100,9 @@ internal fun UserScreenNavGraph (
             }
 
             MainRoutes.CONTRACTS -> {
+                ContractScreen(
+                    onCheckoutNav = onCheckoutNav,
+                )
             }
             MainRoutes.NOTIFICATIONS -> {
                 NotificationScreen(

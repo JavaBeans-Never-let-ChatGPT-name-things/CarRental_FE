@@ -1,8 +1,10 @@
 package com.example.carrental_fe.data
 
 import com.example.carrental_fe.dto.request.ContractRequestDTO
+import com.example.carrental_fe.dto.request.ReviewRequestDTO
 import com.example.carrental_fe.dto.response.MessageResponse
 import com.example.carrental_fe.model.Account
+import com.example.carrental_fe.model.Contract
 import com.example.carrental_fe.network.AccountApi
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -48,4 +50,22 @@ class AccountRepositoryImpl (private val accountApi: AccountApi): AccountReposit
         carId: String,
         contractRequestDTO: ContractRequestDTO
     ) = accountApi.rentCar(carId, contractRequestDTO)
+
+    override suspend fun getContracts(): List<Contract>
+            = accountApi.getContracts()
+
+    override suspend fun reviewContract(
+        contractId: Long,
+        review: ReviewRequestDTO
+    ): MessageResponse =
+        accountApi.reviewContract(
+            contractId = contractId,
+            review = review
+        )
+
+    override suspend fun retrySuccess(contractId: Long): MessageResponse
+            = accountApi.retrySuccess(contractId)
+
+    override suspend fun retryContract(contractId: Long): MessageResponse
+            = accountApi.retry(contractId)
 }

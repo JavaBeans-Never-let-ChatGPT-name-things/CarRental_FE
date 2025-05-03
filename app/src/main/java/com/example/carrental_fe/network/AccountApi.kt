@@ -1,8 +1,10 @@
 package com.example.carrental_fe.network
 
 import com.example.carrental_fe.dto.request.ContractRequestDTO
+import com.example.carrental_fe.dto.request.ReviewRequestDTO
 import com.example.carrental_fe.dto.response.MessageResponse
 import com.example.carrental_fe.model.Account
+import com.example.carrental_fe.model.Contract
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -29,4 +31,17 @@ interface AccountApi {
     ): MessageResponse
     @POST("/api/accounts/rentCar/{carId}")
     suspend fun rentCar(@Path("carId") carId: String, @Body contractRequestDTO: ContractRequestDTO): Response<Long>
+
+    @GET("api/accounts/rentalContracts")
+    suspend fun getContracts(): List<Contract>
+
+    @POST("api/accounts/rentalContracts/review/{contractId}")
+    suspend fun reviewContract(@Path("contractId") contractId: Long,
+                               @Body review: ReviewRequestDTO): MessageResponse
+
+    @POST("api/accounts/rentalContracts/retrySuccess/{contractId}")
+    suspend fun retrySuccess(@Path("contractId") contractId: Long): MessageResponse
+
+    @POST("api/accounts/rentalContracts/retry/{contractId}")
+    suspend fun retry(@Path("contractId") contractId: Long): MessageResponse
 }

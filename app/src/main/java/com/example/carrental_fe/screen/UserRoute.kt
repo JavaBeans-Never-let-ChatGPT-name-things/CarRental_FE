@@ -33,7 +33,8 @@ fun UserRoute(
     onNavigateToSearchScreen: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
     onNavigateToCarDetail: (String) -> Unit,
-)
+    onCheckoutNav: (String, String, Long?) -> Unit,
+    )
 {
     val notification: NotificationViewModel = viewModel(factory = NotificationViewModel.Factory)
     var currentRoute by rememberSaveable { mutableStateOf(defaultRoute) }
@@ -89,6 +90,7 @@ fun UserRoute(
             onNavigateToSearchScreen = onNavigateToSearchScreen,
             onNavigateToEditProfile = onNavigateToEditProfile,
             onNavigateToCarDetail = onNavigateToCarDetail,
+            onCheckoutNav = onCheckoutNav,
             currentRoute = currentRoute,
             modifier = Modifier.padding(innerPadding)
         )
