@@ -1,6 +1,8 @@
 package com.example.carrental_fe.screen
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -8,16 +10,23 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.carrental_fe.model.Account
 import com.example.carrental_fe.nav.MainRoutes
 import com.example.carrental_fe.nav.UserScreenNavGraph
 import com.example.carrental_fe.nav.defaultRoute
+import com.example.carrental_fe.screen.userHomeScreen.UserHomeScreenViewModel
+import com.example.carrental_fe.screen.userNotificationScreen.NotificationViewModel
 
 @Composable
 fun UserRoute(
@@ -26,7 +35,17 @@ fun UserRoute(
     onNavigateToCarDetail: (String) -> Unit,
 )
 {
+    val notification: NotificationViewModel = viewModel(factory = NotificationViewModel.Factory)
     var currentRoute by rememberSaveable { mutableStateOf(defaultRoute) }
+    val notificationBadgeCount by notification.unreadNotificationCount.collectAsState()
+    var lastRoute by remember { mutableStateOf(currentRoute) }
+
+    LaunchedEffect(currentRoute) {
+        if (lastRoute == MainRoutes.NOTIFICATIONS && currentRoute != MainRoutes.NOTIFICATIONS) {
+            notification.markAllAsRead()
+        }
+        lastRoute = currentRoute
+    }
     Scaffold (
         containerColor = Color(0xFFFFFFFF),
         bottomBar = { NavigationBar(
@@ -36,9 +55,6 @@ fun UserRoute(
                 val isSelected = route == currentRoute
                 val iconRes = if (isSelected) route.selectedIcon
                 else route.unselectedIcon
-                val icon = @Composable {
-                    Icon(iconRes, null)
-                }
                 NavigationBarItem(
                     selected = isSelected,
                     onClick = {
@@ -47,7 +63,15 @@ fun UserRoute(
                     },
                     label = { Text(stringResource(route.labelResId)) },
                     icon = {
-                        icon()
+                       BadgedBox(
+                           badge = {
+                               if (route == MainRoutes.NOTIFICATIONS && notificationBadgeCount > 0){
+                                   Badge { Text(notificationBadgeCount.toString())}
+                               }
+                           }
+                       ) {
+                           Icon(iconRes,null)
+                       }
                     },
                     colors = NavigationBarItemDefaults.colors(
                         indicatorColor = Color(0xFFAED4FD),
@@ -61,6 +85,7 @@ fun UserRoute(
     ) {
             innerPadding ->
         UserScreenNavGraph(
+            vm = notification,
             onNavigateToSearchScreen = onNavigateToSearchScreen,
             onNavigateToEditProfile = onNavigateToEditProfile,
             onNavigateToCarDetail = onNavigateToCarDetail,
