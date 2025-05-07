@@ -22,16 +22,13 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
-import com.example.carrental_fe.model.Account
-import com.example.carrental_fe.screen.userContractScreen.ContractScreen
-import com.example.carrental_fe.screen.userFavScreen.FavouriteScreen
-import com.example.carrental_fe.screen.userHomeScreen.HomeScreen
-import com.example.carrental_fe.screen.userHomeScreen.UserHomeScreenViewModel
-import com.example.carrental_fe.screen.userProfile.ProfileScreen
-import com.example.carrental_fe.screen.userNotificationScreen.NotificationScreen
-import com.example.carrental_fe.screen.userNotificationScreen.NotificationViewModel
+import com.example.carrental_fe.screen.user.userContractScreen.ContractScreen
+import com.example.carrental_fe.screen.user.userFavScreen.FavouriteScreen
+import com.example.carrental_fe.screen.user.userHomeScreen.HomeScreen
+import com.example.carrental_fe.screen.user.userProfile.ProfileScreen
+import com.example.carrental_fe.screen.user.userNotificationScreen.NotificationScreen
+import com.example.carrental_fe.screen.user.userNotificationScreen.NotificationViewModel
 
 internal val defaultRoute = MainRoutes.HOME
 

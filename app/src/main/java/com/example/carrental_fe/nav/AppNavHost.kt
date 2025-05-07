@@ -9,16 +9,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.carrental_fe.dto.response.TokenResponse
-import com.example.carrental_fe.screen.UserRoute
+import com.example.carrental_fe.screen.user.UserRoute
 import com.example.carrental_fe.screen.forgot.ForgotPasswordScreen
 import com.example.carrental_fe.screen.login.LoginScreen
 import com.example.carrental_fe.screen.resetPassword.ResetPasswordScreen
 import com.example.carrental_fe.screen.signup.RegisterScreen
-import com.example.carrental_fe.screen.userCarDetail.CarDetailScreen
-import com.example.carrental_fe.screen.userCheckout.PaymentWebViewScreen
-import com.example.carrental_fe.screen.userContractDetail.ContractDetailsScreen
-import com.example.carrental_fe.screen.userEditProfile.EditProfileScreen
-import com.example.carrental_fe.screen.userSearchScreen.SearchScreen
+import com.example.carrental_fe.screen.user.userCarDetail.CarDetailScreen
+import com.example.carrental_fe.screen.user.userCheckout.PaymentWebViewScreen
+import com.example.carrental_fe.screen.user.userContractDetail.ContractDetailsScreen
+import com.example.carrental_fe.screen.user.userEditProfile.EditProfileScreen
+import com.example.carrental_fe.screen.user.userSearchScreen.SearchScreen
 import com.example.carrental_fe.screen.verify.VerifyAccountScreen
 import kotlinx.serialization.Serializable
 @Serializable
