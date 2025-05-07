@@ -69,6 +69,10 @@ class SearchScreenViewModel (private val carRepository: CarRepository) : ViewMod
             if (response.isSuccessful) {
                 _cars.value = response.body() ?: emptyList()
             }
+            else
+            {
+                _cars.value = emptyList()
+            }
 
         }
     }

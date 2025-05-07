@@ -55,7 +55,7 @@ data class CarDetail(val carId: String? = null)
 data class ContractDetail(val carPrice: Float? = null, val carId: String? = null)
 
 @Serializable
-data class PaymentWebView(val url: String? = null, val carId: String? = null, val contractId: Long? = null)
+data class PaymentWebView(val url: String? = null, val carId: String? = null, val contractId: Long? = null, val isRetry : Boolean?)
 @Composable
 fun AppNavHost (navController: NavHostController = rememberNavController())
 {
@@ -123,22 +123,38 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
         }
         composable<User> {
             UserRoute(
-                onNavigateToSearchScreen = {navController.navigate(route = Search) {
-                    popUpTo(route = User) { inclusive = false }
-                }},
+                onNavigateToSearchScreen = {
+                    navController.navigate(route = Search) {
+                        popUpTo(route = User) { inclusive = false }
+                    }
+                },
                 onNavigateToEditProfile = {
                     navController.navigate(route = EditProfile) {
                         popUpTo(route = User) { inclusive = false }
                         launchSingleTop = true
                     }
                 },
-                onNavigateToCarDetail ={ carId ->
-                    navController.navigate(route = CarDetail(carId)){
+                onNavigateToCarDetail = { carId ->
+                    navController.navigate(route = CarDetail(carId)) {
                         popUpTo(route = User) { inclusive = false }
                         launchSingleTop = true
                     }
+                },
+                onCheckoutNav = { response, carId, contractId ->
+                    navController.navigate(
+                        route = PaymentWebView(
+                            response,
+                            carId,
+                            contractId,
+                            true
+                        )
+                    ) {
+                        popUpTo(route = ContractDetail(carId = carId)) { inclusive = false }
+                        launchSingleTop = true
+                    }
                 }
-            ) }
+            )
+        }
         composable<Admin> {  }
         composable <Search> {
             SearchScreen(
@@ -166,7 +182,7 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
         composable<ContractDetail> {
             ContractDetailsScreen(
                 onCheckoutNav = {
-                        response, carId, contractId -> navController.navigate(route = PaymentWebView(response, carId, contractId)){
+                        response, carId, contractId -> navController.navigate(route = PaymentWebView(response, carId, contractId, false)){
                     popUpTo(route = ContractDetail(carId = carId)) { inclusive = false }
                     launchSingleTop = true
                 }
