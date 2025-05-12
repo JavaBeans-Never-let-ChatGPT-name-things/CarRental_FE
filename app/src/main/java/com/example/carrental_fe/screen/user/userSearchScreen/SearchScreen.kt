@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -36,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +52,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
 import com.example.carrental_fe.screen.user.userHomeScreen.CarCard
 import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 
+@OptIn(FlowPreview::class)
 @Composable
 fun SearchScreen(
     onNavigateToCarDetail: (String) -> Unit,
@@ -65,14 +73,27 @@ fun SearchScreen(
     val currentPage by viewModel.currentPage.collectAsState()
     val favourtiteCars by viewModel.favouriteCars.collectAsState()
     val totalPage by viewModel.totalPages.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            listState.scrollToItem(0)
+        }
+    }
     LaunchedEffect(Unit) {
         showContent = true
     }
-    LaunchedEffect(currentPage) {
-        listState.animateScrollToItem(0)
-    }
-    LaunchedEffect(query){
-        viewModel.setCurrentPage()
+    LaunchedEffect(Unit) {
+        snapshotFlow { query }
+            .debounce(500)
+            .distinctUntilChanged()
+            .collectLatest { queryText ->
+                if (queryText.isBlank()) {
+                    viewModel.clearSearchResults()
+                } else {
+                    viewModel.setCurrentPage(1)
+                    viewModel.getCars()
+                }
+            }
     }
     AnimatedVisibility(
         visible = showContent,
@@ -95,7 +116,6 @@ fun SearchScreen(
                 value = query,
                 onValueChange = {
                     viewModel.setSearchQuery(it)
-                    viewModel.getCars()
                 },
                 placeholder = { Text("Looking for car", color = Color.Gray) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
@@ -121,24 +141,34 @@ fun SearchScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 8.dp)
+                    .padding(bottom = 8.dp, top = 16.dp),
+                verticalArrangement = Arrangement.Center
             ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    state = listState
-                ) {
-                    items(cars) { car ->
-                        CarCard(
-                            car = car,
-                            isFavorite = favourtiteCars.any { it.id == car.id },
-                            onFavoriteClick = { viewModel.toggleFavourite(car.id) },
-                            onCarCardClick = {
-                                onNavigateToCarDetail(car.id)
-                            }
-                        )
+                if (isLoading)
+                {
+                    CircularProgressIndicator(color = Color(0xFF0D6EFD),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                            .size(50.dp)
+                            .weight(1f),)
+                }
+                else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        state = listState
+                    ) {
+                        items(cars) { car ->
+                            CarCard(
+                                car = car,
+                                isFavorite = favourtiteCars.any { it.id == car.id },
+                                onFavoriteClick = { viewModel.toggleFavourite(car.id) },
+                                onCarCardClick = {
+                                    onNavigateToCarDetail(car.id)
+                                }
+                            )
+                        }
                     }
                 }
                 if (cars.isNotEmpty()) {

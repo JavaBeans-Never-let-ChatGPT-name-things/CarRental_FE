@@ -27,6 +27,9 @@ class SearchScreenViewModel (private val carRepository: CarRepository) : ViewMod
     private val _totalPages = MutableStateFlow<Int>(1)
     val totalPages: StateFlow<Int> = _totalPages
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     private val _favouriteCars = MutableStateFlow<List<Car>>(emptyList())
     val favouriteCars: StateFlow<List<Car>> = _favouriteCars
     fun resetSearchScreen(){
@@ -36,11 +39,10 @@ class SearchScreenViewModel (private val carRepository: CarRepository) : ViewMod
         _cars.value = emptyList()
         loadFavouriteCar()
     }
-    fun setCurrentPage() {
-        _currentPage.value = 1
-    }
+
     fun setSearchQuery(query: String) {
         _query.value = query
+        _currentPage.value = 1
     }
     fun loadFavouriteCar(){
         viewModelScope.launch {
@@ -50,31 +52,33 @@ class SearchScreenViewModel (private val carRepository: CarRepository) : ViewMod
             }
         }
     }
-    fun getCars(){
-        if (query.value.isEmpty())
-        {
-            _cars.value = emptyList()
-            _totalPages.value = 0
-            return
-        }
+    fun getCars() {
         viewModelScope.launch {
+            _isLoading.value = true
             val request = CarPageRequestDTO(
                 pageNo = currentPage.value - 1,
                 sort = "ASC",
                 sortByColumn = "id"
             )
-            val count = carRepository.countFilter(_query.value).body()?: 0L
+
+            val count = carRepository.countFilter(query.value).body() ?: 0L
             _totalPages.value = ((count + 9) / 10).toInt()
             val response = carRepository.getFilterCarPageByBrand(request, query.value)
             if (response.isSuccessful) {
                 _cars.value = response.body() ?: emptyList()
-            }
-            else
-            {
+            } else {
                 _cars.value = emptyList()
             }
-
+            _isLoading.value = false
         }
+    }
+    fun clearSearchResults() {
+        _cars.value = emptyList()
+        _totalPages.value = 0
+        _currentPage.value = 1
+    }
+    fun setCurrentPage(page: Int) {
+        _currentPage.value = page
     }
     fun toggleFavourite(carId: String) {
         viewModelScope.launch {
