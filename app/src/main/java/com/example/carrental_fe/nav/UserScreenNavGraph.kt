@@ -67,6 +67,7 @@ internal enum class MainRoutes(
 internal fun UserScreenNavGraph (
     vm: NotificationViewModel,
     onNavigateToSearchScreen: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
     onNavigateToCarDetail: (carId: String) -> Unit,
     onCheckoutNav: (String, String, Long?) -> Unit,
@@ -107,7 +108,8 @@ internal fun UserScreenNavGraph (
                 )
             }
             MainRoutes.PROFILE -> {
-                ProfileScreen(onNavigateToEditProfile = onNavigateToEditProfile)
+                ProfileScreen(onNavigateToEditProfile = onNavigateToEditProfile,
+                    onNavigateToLogin = onNavigateToLogin)
             }
         }
     }

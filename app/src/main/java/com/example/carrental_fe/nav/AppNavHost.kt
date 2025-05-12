@@ -152,7 +152,12 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                         popUpTo(route = ContractDetail(carId = carId)) { inclusive = false }
                         launchSingleTop = true
                     }
-                }
+                },
+                onNavigateToLogin = {
+                    navController.navigate(route = Login) {
+                        popUpTo(route = User) { inclusive = true }
+                    }
+                },
             )
         }
         composable<Admin> {  }

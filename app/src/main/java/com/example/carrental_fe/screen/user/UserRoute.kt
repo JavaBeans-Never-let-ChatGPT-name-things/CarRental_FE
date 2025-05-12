@@ -28,6 +28,7 @@ import com.example.carrental_fe.screen.user.userNotificationScreen.NotificationV
 
 @Composable
 fun UserRoute(
+    onNavigateToLogin: () -> Unit,
     onNavigateToSearchScreen: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
     onNavigateToCarDetail: (String) -> Unit,
@@ -86,6 +87,7 @@ fun UserRoute(
         UserScreenNavGraph(
             vm = notification,
             onNavigateToSearchScreen = onNavigateToSearchScreen,
+            onNavigateToLogin = onNavigateToLogin,
             onNavigateToEditProfile = onNavigateToEditProfile,
             onNavigateToCarDetail = onNavigateToCarDetail,
             onCheckoutNav = onCheckoutNav,
