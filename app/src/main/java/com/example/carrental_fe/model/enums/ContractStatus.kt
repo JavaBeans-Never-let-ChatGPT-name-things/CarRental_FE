@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class ContractStatus {
-    BOOKED, EXPIRED, COMPLETE, OVERDUE, REVIEWED
+    BOOKED, PICKED_UP, EXPIRED, COMPLETE, OVERDUE, REVIEWED
 }
