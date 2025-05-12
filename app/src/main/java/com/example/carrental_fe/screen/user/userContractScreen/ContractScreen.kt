@@ -32,6 +32,7 @@ import com.example.carrental_fe.R
 import com.example.carrental_fe.dialog.ReviewDialog
 import com.example.carrental_fe.model.enums.ContractStatus
 import com.example.carrental_fe.model.enums.PaymentStatus
+import com.example.carrental_fe.model.enums.ReturnCarStatus
 import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
 import java.time.ZoneId
@@ -104,6 +105,17 @@ fun ContractScreen(
 
                         ContractRow("Payment Status", contract.paymentStatus.name, paymentColor)
                         ContractRow("Contract Status", contract.contractStatus.name, statusColor)
+
+                        if (contract.returnCarStatus == ReturnCarStatus.INTACT)
+                        {
+                            ContractRow("Return Car Status", contract.returnCarStatus.name, blue)
+                        }
+                        else if (contract.returnCarStatus == ReturnCarStatus.DAMAGED ||
+                            contract.returnCarStatus == ReturnCarStatus.LOST ||
+                            contract.returnCarStatus == ReturnCarStatus.NOT_RETURNED )
+                        {
+                            ContractRow("Return Car Status", contract.returnCarStatus.name, red)
+                        }
 
                         ContractRow("Total Price", "$${contract.totalPrice.toInt()}")
 
