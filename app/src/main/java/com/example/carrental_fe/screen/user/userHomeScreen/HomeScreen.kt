@@ -18,14 +18,15 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.runtime.getValue
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,11 +60,13 @@ fun HomeScreen(
     val totalPages by viewModel.totalPages.collectAsState()
     val currentPage by viewModel.currentPage.collectAsState()
     val favourtiteCars by viewModel.favouriteCars.collectAsState()
-    LaunchedEffect(currentPage) {
-        listState.animateScrollToItem(0)
-    }
-    LaunchedEffect(selectedBrand) {
-        listState.animateScrollToItem(0)
+    val isLoading by viewModel.isLoading.collectAsState()
+    val isLoadingBrand by viewModel.isLoadingBrand.collectAsState()
+
+    LaunchedEffect(isLoading) {
+        if (!isLoading) {
+            listState.scrollToItem(0)
+        }
     }
     LaunchedEffect(Unit) {
         viewModel.resetPage()
@@ -108,15 +111,27 @@ fun HomeScreen(
                     }
             )
         }
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(carBrands) { brand ->
-                BrandLogoCard(
-                    carBrand = brand,
-                    isSelected = selectedBrand?.id == brand.id,
-                    onBrandClick = {
-                        viewModel.loadCarsByBrand(brand)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(75.dp),
+            contentAlignment = Alignment.Center
+        ){
+            if (isLoadingBrand) {
+                CircularProgressIndicator(color = Color(0xFF0D6EFD))
+            }
+            else {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(carBrands) { brand ->
+                        BrandLogoCard(
+                            carBrand = brand,
+                            isSelected = selectedBrand?.id == brand.id,
+                            onBrandClick = {
+                                viewModel.loadCarsByBrand(brand)
+                            }
+                        )
                     }
-                )
+                }
             }
         }
 
@@ -127,23 +142,31 @@ fun HomeScreen(
 
         Box(modifier = Modifier
             .fillMaxWidth()
-            .weight(1f)
+            .weight(1f),
+            contentAlignment = Alignment.Center
         ) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize(),
-                state = listState
-            ) {
-                items(cars) { car ->
-                    CarCard(
-                        car = car,
-                        isFavorite = favourtiteCars.any { it.id == car.id },
-                        onFavoriteClick = {
-                            viewModel.toggleFavourite(car.id) },
-                        onCarCardClick = {
-                            onNavigateToCarDetail(car.id)
-                        }
-                    )
+            if (isLoading)
+            {
+                CircularProgressIndicator(color = Color(0xFF0D6EFD))
+            }
+            else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize(),
+                    state = listState
+                ) {
+                    items(cars) { car ->
+                        CarCard(
+                            car = car,
+                            isFavorite = favourtiteCars.any { it.id == car.id },
+                            onFavoriteClick = {
+                                viewModel.toggleFavourite(car.id)
+                            },
+                            onCarCardClick = {
+                                onNavigateToCarDetail(car.id)
+                            }
+                        )
+                    }
                 }
             }
         }

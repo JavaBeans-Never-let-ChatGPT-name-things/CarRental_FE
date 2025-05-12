@@ -35,6 +35,12 @@ class UserHomeScreenViewModel (private val carRepository: CarRepository) : ViewM
     private val _favouriteCars = MutableStateFlow<List<Car>>(emptyList())
     val favouriteCars: StateFlow<List<Car>> = _favouriteCars
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _isLoadingBrand = MutableStateFlow(false)
+    val isLoadingBrand: StateFlow<Boolean> = _isLoadingBrand
+
     init {
         loadCarBrands()
         loadCars()
@@ -42,18 +48,21 @@ class UserHomeScreenViewModel (private val carRepository: CarRepository) : ViewM
     }
     fun loadCarBrands() {
         viewModelScope.launch {
+            _isLoadingBrand.value = true
             val response = carRepository.getCarBrands()
             if (response.isSuccessful) {
                 _carBrands.value = response.body() ?: emptyList()
             }
             val count = carRepository.getCount().body() ?: 1L
             _totalPages.value = ((count + 9) / 10).toInt()
+            _isLoadingBrand.value = false
         }
     }
     fun loadCarsByBrand(brand: CarBrand)
     {
         _selectedBrand.value = brand
         viewModelScope.launch {
+            _isLoading.value = true
             val count = carRepository.getCountByBrand(brand.id).body() ?: 1L
             _totalPages.value = ((count + 9) / 10).toInt()
             _currentPage.value = 1
@@ -66,10 +75,12 @@ class UserHomeScreenViewModel (private val carRepository: CarRepository) : ViewM
             if (response.isSuccessful) {
                 _cars.value = response.body() ?: emptyList()
             }
+            _isLoading.value = false
         }
     }
     fun loadCars() {
         viewModelScope.launch {
+            _isLoading.value = true
             val request = CarPageRequestDTO(
                 pageNo = currentPage.value - 1,
                 sort = "ASC",
@@ -79,6 +90,7 @@ class UserHomeScreenViewModel (private val carRepository: CarRepository) : ViewM
             if (response.isSuccessful) {
                 _cars.value = response.body() ?: emptyList()
             }
+            _isLoading.value = false
         }
     }
     fun goToPage(page: Int) {
@@ -91,10 +103,12 @@ class UserHomeScreenViewModel (private val carRepository: CarRepository) : ViewM
                     sortByColumn = "id"
                 )
                 viewModelScope.launch {
+                    _isLoading.value = true
                     val response = carRepository.getCarPageByBrand(request, selectedBrand.value!!.id)
                     if (response.isSuccessful) {
                         _cars.value = response.body() ?: emptyList()
                     }
+                    _isLoading.value = false
                 }
             } else loadCars()
         }
