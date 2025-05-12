@@ -20,13 +20,18 @@ class FavouriteScreenViewModel (private val carRepository: CarRepository) : View
     private val _currentList = MutableStateFlow<List<Car>>(emptyList())
     val currentList: StateFlow<List<Car>> = _currentList
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     fun resetFavourite(){
         viewModelScope.launch {
+            _isLoading.value = true
             val responseFav = carRepository.getFavourites()
             if (responseFav.isSuccessful) {
                 _favouriteCars.value = responseFav.body() ?: emptyList()
                 _currentList.value = _favouriteCars.value
             }
+            _isLoading.value = false
         }
     }
     fun toggleFavouriteInFavScreen(carId: String) {
