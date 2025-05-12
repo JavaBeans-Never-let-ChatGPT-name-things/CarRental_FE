@@ -105,20 +105,20 @@ fun ProfileScreen(
                     .clip(CircleShape)
                     .border(1.dp, Color.White, CircleShape)
                     .align(Alignment.CenterHorizontally),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = R.drawable.male_avatar_svgrepo_com),
-                error = painterResource(id = R.drawable.male_avatar_svgrepo_com)
+                contentScale = ContentScale.Fit,
+                placeholder = painterResource(id = if (accountInfo.value?.gender == 1) R.drawable.male else R.drawable.female),
+                error = painterResource(id = if (accountInfo.value?.gender == 1) R.drawable.male else R.drawable.female)
             )
         } else {
             Image(
-                painter = painterResource(id = R.drawable.male_avatar_svgrepo_com),
+                painter = painterResource(id = if (accountInfo.value?.gender == 1) R.drawable.male else R.drawable.female),
                 contentDescription = "Default Profile Image",
                 modifier = Modifier
                     .size(110.dp)
                     .clip(CircleShape)
                     .border(1.dp, Color.White, CircleShape)
                     .align(Alignment.CenterHorizontally),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Fit
             )
         }
         // Tên
