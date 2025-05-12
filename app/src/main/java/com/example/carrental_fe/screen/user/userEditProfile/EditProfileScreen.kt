@@ -128,14 +128,14 @@ fun EditProfileScreen(
                     .border(1.dp, Color.White, CircleShape)
                     .align(Alignment.CenterHorizontally)
                     .clickable { imageLauncher.launch("image/*") },
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = R.drawable.male_avatar_svgrepo_com),
-                error = painterResource(id = R.drawable.male_avatar_svgrepo_com)
+                contentScale = ContentScale.Fit,
+                placeholder = painterResource(id = if (gender == 1) R.drawable.male else R.drawable.female),
+                error = painterResource(id = if (gender == 1) R.drawable.male else R.drawable.female)
             )
         } else {
             // Ảnh mặc định
             Image(
-                painter = painterResource(id = R.drawable.male_avatar_svgrepo_com),
+                painter = painterResource(id = if (gender == 1) R.drawable.male else R.drawable.female),
                 contentDescription = "Default Profile Image",
                 modifier = Modifier
                     .size(110.dp)
@@ -143,7 +143,7 @@ fun EditProfileScreen(
                     .border(1.dp, Color.White, CircleShape)
                     .align(Alignment.CenterHorizontally)
                     .clickable { imageLauncher.launch("image/*") },
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Fit
             )
         }
 
@@ -154,7 +154,8 @@ fun EditProfileScreen(
             placeHolder = "Complete your name",
             value = displayName,
             onValueChange = viewModel::onDisplayNameChanged,
-            editable = true
+            editable = true,
+            inputType = "text"
         )
 
         // Email
@@ -164,7 +165,8 @@ fun EditProfileScreen(
             placeHolder = "Complete your email address",
             value = email,
             onValueChange = viewModel::onEmailChanged,
-            editable = true
+            editable = false,
+            inputType = "email"
         )
 
         // Địa chỉ
@@ -174,7 +176,8 @@ fun EditProfileScreen(
             placeHolder = "Complete your address",
             value = address,
             onValueChange = viewModel::onAddressChanged,
-            editable = true
+            editable = true,
+            inputType = "text"
         )
 
         // Số điện thoại
@@ -184,11 +187,12 @@ fun EditProfileScreen(
             placeHolder = "Complete your phone number",
             value = phoneNumber,
             onValueChange = viewModel::onPhoneNumberChanged,
-            editable = true
+            editable = true,
+            inputType = "number"
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-        InputLabel("Gender", drawable = R.drawable.email)
+        InputLabel("Gender", drawable = R.drawable.gender)
 
         Row(
             verticalAlignment = Alignment.CenterVertically,

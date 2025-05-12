@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,7 +42,11 @@ import com.example.carrental_fe.R
 
 @Composable
 fun InputField(value:String, placeHolder:String, onValueChange:(String) -> Unit, modifier: Modifier = Modifier
-, editable: Boolean = true) {
+               ,editable: Boolean = true, inputType: String = "text") {
+    val keyboardOptions = when (inputType.lowercase()) {
+        "number" -> KeyboardOptions(keyboardType = KeyboardType.Number)
+        else -> KeyboardOptions.Default
+    }
     TextField(
         value = value,
         onValueChange = { onValueChange(it) },
@@ -50,6 +56,7 @@ fun InputField(value:String, placeHolder:String, onValueChange:(String) -> Unit,
             .padding(horizontal = 8.dp, vertical = 4.dp),
         placeholder = { Text(placeHolder, color = Color.LightGray) },
         singleLine = true,
+        keyboardOptions = keyboardOptions,
         readOnly = !editable,
         textStyle = TextStyle(color = Color.Gray, fontSize = 16.sp),
         colors = TextFieldDefaults.colors(
