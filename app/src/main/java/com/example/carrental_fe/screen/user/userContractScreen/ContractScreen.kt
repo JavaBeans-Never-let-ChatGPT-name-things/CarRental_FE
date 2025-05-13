@@ -2,7 +2,9 @@ package com.example.carrental_fe.screen.user.userContractScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,11 +14,21 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,12 +41,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.carrental_fe.R
+import com.example.carrental_fe.dialog.ConfirmReportLostDialog
 import com.example.carrental_fe.dialog.ReviewDialog
 import com.example.carrental_fe.model.enums.ContractStatus
 import com.example.carrental_fe.model.enums.PaymentStatus
 import com.example.carrental_fe.model.enums.ReturnCarStatus
 import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -50,6 +64,8 @@ fun ContractScreen(
     val comment = vm.reviewComment.collectAsState()
     val blue = Color(0xFF0D6EFD)
     val red = Color.Red
+    val showConfirmDialog = remember { mutableStateOf(false) }
+    val lostContractId = remember { mutableStateOf<Long?>(null) }
     Column(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)
@@ -106,23 +122,26 @@ fun ContractScreen(
                         ContractRow("Payment Status", contract.paymentStatus.name, paymentColor)
                         ContractRow("Contract Status", contract.contractStatus.name, statusColor)
 
-                        if (contract.returnCarStatus == ReturnCarStatus.INTACT)
-                        {
-                            ContractRow("Return Car Status", contract.returnCarStatus.name, blue)
+                        if (contract.returnCarStatus != null ) {
+                            if (contract.returnCarStatus == ReturnCarStatus.INTACT) {
+                                ContractRow(
+                                    "Return Car Status",
+                                    contract.returnCarStatus.name,
+                                    blue
+                                )
+                            } else if (contract.returnCarStatus == ReturnCarStatus.DAMAGED ||
+                                contract.returnCarStatus == ReturnCarStatus.LOST ||
+                                contract.returnCarStatus == ReturnCarStatus.NOT_RETURNED
+                            ) {
+                                ContractRow("Return Car Status", contract.returnCarStatus.name, red)
+                            }
                         }
-                        else if (contract.returnCarStatus == ReturnCarStatus.DAMAGED ||
-                            contract.returnCarStatus == ReturnCarStatus.LOST ||
-                            contract.returnCarStatus == ReturnCarStatus.NOT_RETURNED )
-                        {
-                            ContractRow("Return Car Status", contract.returnCarStatus.name, red)
-                        }
-
                         ContractRow("Total Price", "$${contract.totalPrice.toInt()}")
 
                         ContractRow("Deposit", "$${contract.deposit.toInt()}")
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        if (contract.contractStatus == ContractStatus.COMPLETE) {
+                        if (contract.contractStatus == ContractStatus.COMPLETE && contract.returnCarStatus != ReturnCarStatus.LOST) {
                             CustomButton(
                                 backgroundColor = blue,
                                 text = "Review Now",
@@ -139,6 +158,24 @@ fun ContractScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
+                        if (contract.contractStatus == ContractStatus.PICKED_UP) {
+                            CustomButton(
+                                backgroundColor = red,
+                                text = "Report Lost",
+                                textColor = 0xFFFFFFFF,
+                                onClickChange = {
+                                    lostContractId.value = contract.id
+                                    showConfirmDialog.value = true
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                        val tomorrow = LocalDate.now().plusDays(1)
+                        if (contract.endDate == tomorrow && contract.contractStatus == ContractStatus.PICKED_UP) {
+                            ExtendContractSection(contract.id, vm, blue)
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
                 }
             }
@@ -154,6 +191,19 @@ fun ContractScreen(
             onConfirm = { vm.onReviewSubmit() }
         )
     }
+    if (showConfirmDialog.value && lostContractId.value != null) {
+        ConfirmReportLostDialog(
+            title = "Confirm Report Lost",
+            message = "Are you sure you want to report the car as lost?",
+            onConfirm = {
+                vm.reportLostContract(lostContractId.value!!)
+                showConfirmDialog.value = false
+            },
+            onDismiss = {
+                showConfirmDialog.value = false
+            }
+        )
+    }
 }
 @Composable
 fun ContractRow(label: String, value: String, valueColor: Color = Color.Black) {
@@ -161,5 +211,57 @@ fun ContractRow(label: String, value: String, valueColor: Color = Color.Black) {
         Text(label, fontFamily = FontFamily(Font(R.font.montserrat_semibold)), fontSize = 14.sp)
         Spacer(modifier = Modifier.height(4.dp))
         Text(value, color = valueColor,fontFamily = FontFamily(Font(R.font.montserrat_medium)), fontSize = 14.sp)
+    }
+}
+@Composable
+fun ExtendContractSection(
+    contractId: Long,
+    vm: ContractViewModel,
+    blue: Color
+) {
+    var selectedDays by remember { mutableIntStateOf(0) }
+    val daysOptions = (0..3).toList()
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Dropdown để chọn số ngày
+        var expanded by remember { mutableStateOf(false) }
+        Box {
+            OutlinedButton(
+                onClick = { expanded = true },
+
+                ) {
+                Text("Extend: $selectedDays day(s)")
+            }
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                daysOptions.forEach { day ->
+                    DropdownMenuItem(
+                        onClick = {
+                            selectedDays = day
+                            expanded = false
+                        },
+                        text = { Text("$day day(s)") }
+                    )
+                }
+            }
+        }
+
+        Button(
+            onClick = {
+                vm.extendContract(contractId, selectedDays)
+            },
+            enabled = selectedDays > 0,
+            colors = ButtonDefaults.buttonColors(blue),
+            modifier = Modifier.weight(1f)
+        ) {
+            Text("Extend Contract", color = Color.White)
+        }
     }
 }

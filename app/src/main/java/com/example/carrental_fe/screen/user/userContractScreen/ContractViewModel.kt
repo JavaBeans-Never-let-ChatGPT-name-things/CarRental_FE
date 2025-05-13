@@ -81,6 +81,29 @@ class ContractViewModel (private val accountRepository: AccountRepository,
             }
         }
     }
+    fun reportLostContract(contractId: Long) {
+        viewModelScope.launch {
+            try {
+                val res = accountRepository.reportLost(contractId)
+                Log.d("ReportLost", res.message)
+                fetchContracts()
+            } catch (e: Exception) {
+                Log.e("ReportLost error", e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    fun extendContract(contractId: Long, extraDays: Int) {
+        viewModelScope.launch {
+            try {
+                val res = accountRepository.extendContract(contractId, extraDays)
+                Log.d("ExtendContract", res.message)
+                fetchContracts()
+            } catch (e: Exception) {
+                Log.e("ExtendContract error", e.message ?: "Unknown error")
+            }
+        }
+    }
     companion object{
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
