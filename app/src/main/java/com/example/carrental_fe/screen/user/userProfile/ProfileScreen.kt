@@ -21,6 +21,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.carrental_fe.R
+import com.example.carrental_fe.dialog.LoadingDialog
 import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.component.InputField
 import com.example.carrental_fe.screen.component.InputLabel
@@ -41,9 +46,15 @@ import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
 @Composable
 fun ProfileScreen(
     viewModel: ProfileScreenViewModel = viewModel(factory = ProfileScreenViewModel.Factory),
+    onNavigateToLogin:() -> Unit,
     onNavigateToEditProfile: () -> Unit) {
     val context = LocalContext.current
     val accountInfo = viewModel.accountInfo.collectAsState()
+    var isLoading by remember { mutableStateOf(false) }
+
+    if (isLoading) {
+        LoadingDialog(text = "Logging out ....")
+    }
     LaunchedEffect(Unit) {
         viewModel.getAccountInfo()
     }
@@ -94,20 +105,20 @@ fun ProfileScreen(
                     .clip(CircleShape)
                     .border(1.dp, Color.White, CircleShape)
                     .align(Alignment.CenterHorizontally),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(id = R.drawable.male_avatar_svgrepo_com),
-                error = painterResource(id = R.drawable.male_avatar_svgrepo_com)
+                contentScale = ContentScale.Fit,
+                placeholder = painterResource(id = if (accountInfo.value?.gender == 1) R.drawable.male else R.drawable.female),
+                error = painterResource(id = if (accountInfo.value?.gender == 1) R.drawable.male else R.drawable.female)
             )
         } else {
             Image(
-                painter = painterResource(id = R.drawable.male_avatar_svgrepo_com),
+                painter = painterResource(id = if (accountInfo.value?.gender == 1) R.drawable.male else R.drawable.female),
                 contentDescription = "Default Profile Image",
                 modifier = Modifier
                     .size(110.dp)
                     .clip(CircleShape)
                     .border(1.dp, Color.White, CircleShape)
                     .align(Alignment.CenterHorizontally),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Fit
             )
         }
         // Tên
@@ -166,7 +177,13 @@ fun ProfileScreen(
             backgroundColor = Color(0xFF0D6EFD),
             text = "Log out",
             textColor = 0xFFFFFFFF,
-            onClickChange = {}
+            onClickChange = {
+                isLoading = true
+                viewModel.logout {
+                    isLoading = false
+                    onNavigateToLogin()
+                }
+            }
         )
     }
 }

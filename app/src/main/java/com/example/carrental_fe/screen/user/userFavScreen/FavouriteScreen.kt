@@ -9,14 +9,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
@@ -34,6 +36,7 @@ fun FavouriteScreen(
     onNavigateToCarDetail: (String) -> Unit,
     viewModel: FavouriteScreenViewModel = viewModel(factory = FavouriteScreenViewModel.Factory))
 {
+    val isLoading by viewModel.isLoading.collectAsState()
     LaunchedEffect(Unit) {
         viewModel.resetFavourite()
     }
@@ -57,26 +60,30 @@ fun FavouriteScreen(
             fontWeight = FontWeight.SemiBold,
             fontSize = 18.sp
         )
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f)
+                .weight(1f),
+            contentAlignment = Alignment.Center
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(currentFavDisplayList) { car ->
-                    CarCard(
-                        car = car,
-                        isFavorite = favouriteCars.any { it.id == car.id },
-                        onFavoriteClick = { viewModel.toggleFavouriteInFavScreen(car.id) },
-                        onCarCardClick = {
-                            onNavigateToCarDetail(car.id)
-                        }
-                    )
+            if (isLoading){
+                CircularProgressIndicator(color = Color(0xFF0D6EFD), modifier = Modifier.size(100.dp))
+            }
+            else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    items(currentFavDisplayList) { car ->
+                        CarCard(
+                            car = car,
+                            isFavorite = favouriteCars.any { it.id == car.id },
+                            onFavoriteClick = { viewModel.toggleFavouriteInFavScreen(car.id) },
+                            onCarCardClick = {
+                                onNavigateToCarDetail(car.id)
+                            }
+                        )
+                    }
                 }
             }
         }

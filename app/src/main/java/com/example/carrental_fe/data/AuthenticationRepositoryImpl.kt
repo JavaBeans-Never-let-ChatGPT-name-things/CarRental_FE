@@ -33,4 +33,7 @@ class AuthenticationRepositoryImpl (private val authApi: AuthApi): Authenticatio
 
     override suspend fun refresh(refreshToken: String): TokenResponse
             = authApi.refresh(refreshToken)
+
+    override suspend fun logout(refreshToken: String): MessageResponse
+            = authApi.logout(refreshToken)
 }

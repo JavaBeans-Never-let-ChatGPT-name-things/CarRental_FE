@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,6 +25,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,6 +50,9 @@ fun LoginScreen (
 
     var showErrorDialog by remember { mutableStateOf(false) }
     var showLoadingDialog by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        loginViewModel.resetFields()
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -150,7 +153,6 @@ fun LoginScreen (
             is LoginState.Success -> {
                 showLoadingDialog = false
                 onLoginSuccessNav((loginState as LoginState.Success).tokenResponse)
-                loginViewModel.resetFields()
                 loginViewModel.resetState()
             }
             else -> showLoadingDialog = false

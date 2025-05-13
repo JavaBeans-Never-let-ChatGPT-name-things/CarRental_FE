@@ -68,4 +68,13 @@ class AccountRepositoryImpl (private val accountApi: AccountApi): AccountReposit
 
     override suspend fun retryContract(contractId: Long): MessageResponse
             = accountApi.retry(contractId)
+
+    override suspend fun reportLost(contractId: Long): MessageResponse
+            = accountApi.confirmLost(contractId)
+
+    override suspend fun extendContract(
+        contractId: Long,
+        extraDays: Int
+    ): MessageResponse
+            = accountApi.extendContract(contractId, extraDays)
 }

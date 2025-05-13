@@ -38,4 +38,9 @@ interface AuthApi {
         @Header("Authorization") token: String
     ): TokenResponse
 
+
+    @POST("/api/auth/logout")
+    suspend fun logout(
+        @Header("Authorization") token: String
+    ): MessageResponse
 }

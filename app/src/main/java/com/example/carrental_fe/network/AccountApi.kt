@@ -44,4 +44,14 @@ interface AccountApi {
 
     @POST("api/accounts/rentalContracts/retry/{contractId}")
     suspend fun retry(@Path("contractId") contractId: Long): MessageResponse
+
+
+    @POST("api/accounts/rentalContracts/confirmLost/{contractId}")
+    suspend fun confirmLost(@Path("contractId") contractId: Long): MessageResponse
+
+    @POST("api/accounts/rentalContracts/extend/{contractId}/{extraDays}")
+    suspend fun extendContract(
+        @Path("contractId") contractId: Long,
+        @Path("extraDays") extraDays: Int
+    ): MessageResponse
 }

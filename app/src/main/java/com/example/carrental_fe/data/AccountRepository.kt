@@ -26,4 +26,6 @@ interface AccountRepository {
     suspend fun reviewContract(contractId: Long, review: ReviewRequestDTO): MessageResponse
     suspend fun retrySuccess(contractId: Long): MessageResponse
     suspend fun retryContract(contractId: Long): MessageResponse
+    suspend fun reportLost(contractId: Long): MessageResponse
+    suspend fun extendContract(contractId: Long, extraDays: Int): MessageResponse
 }

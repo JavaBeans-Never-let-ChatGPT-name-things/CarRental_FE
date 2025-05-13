@@ -2,6 +2,7 @@ package com.example.carrental_fe.model
 
 import com.example.carrental_fe.model.enums.ContractStatus
 import com.example.carrental_fe.model.enums.PaymentStatus
+import com.example.carrental_fe.model.enums.ReturnCarStatus
 import com.example.carrental_fe.model.serializer.InstantSerializer
 import com.example.carrental_fe.model.serializer.LocalDateSerializer
 import kotlinx.serialization.Serializable
@@ -21,6 +22,7 @@ data class Contract (
     val contractDate: Instant,
     val contractStatus: ContractStatus,
     val paymentStatus: PaymentStatus,
+    val returnCarStatus: ReturnCarStatus?,
     val deposit: Float,
     val totalPrice: Float
 )
