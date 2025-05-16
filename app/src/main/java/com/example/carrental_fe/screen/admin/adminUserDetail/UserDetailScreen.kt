@@ -35,9 +35,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.components.BackButton
-import com.example.carrental_fe.screen.components.InputField
-import com.example.carrental_fe.screen.components.InputLabel
+import com.example.carrental_fe.screen.component.BackButton
+import com.example.carrental_fe.screen.component.InputField
+import com.example.carrental_fe.screen.component.InputLabel
 import com.example.carrental_fe.screen.user.userContractScreen.ContractCard
 import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
 
