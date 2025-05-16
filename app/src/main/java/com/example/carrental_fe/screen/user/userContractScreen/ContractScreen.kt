@@ -3,6 +3,7 @@ package com.example.carrental_fe.screen.user.userContractScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,8 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -43,6 +44,7 @@ import coil.compose.AsyncImage
 import com.example.carrental_fe.R
 import com.example.carrental_fe.dialog.ConfirmReportLostDialog
 import com.example.carrental_fe.dialog.ReviewDialog
+import com.example.carrental_fe.model.Contract
 import com.example.carrental_fe.model.enums.ContractStatus
 import com.example.carrental_fe.model.enums.PaymentStatus
 import com.example.carrental_fe.model.enums.ReturnCarStatus
@@ -64,6 +66,7 @@ fun ContractScreen(
     val comment = vm.reviewComment.collectAsState()
     val blue = Color(0xFF0D6EFD)
     val red = Color.Red
+    val pagerState = rememberPagerState(pageCount = { contracts.size })
     val showConfirmDialog = remember { mutableStateOf(false) }
     val lostContractId = remember { mutableStateOf<Long?>(null) }
     Column(modifier = Modifier
@@ -73,112 +76,24 @@ fun ContractScreen(
     )
     {
         TopTitle("Contracts")
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(contracts) { contract ->
-                Card(
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(12.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(6.dp),
-                    colors = CardDefaults.cardColors(Color(0xFFF7F7F9))
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = contract.carId.uppercase(),
-                            fontFamily = FontFamily(Font(R.font.montserrat_bold)),
-                            fontSize = 16.sp,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        AsyncImage(
-                            model = contract.carImageUrl,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(160.dp)
-                                .clip(RoundedCornerShape(12.dp)),
-                            contentScale = ContentScale.Fit
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        ContractRow("Contract Date", contract.contractDate.atZone(ZoneId.systemDefault()).toLocalDate().format(dateFormatter))
-                        ContractRow("Start From", contract.startDate.format(dateFormatter))
-                        ContractRow("End At", contract.endDate.format(dateFormatter))
-
-                        val paymentColor =
-                            if (contract.paymentStatus == PaymentStatus.SUCCESS) blue else red
-                        val statusColor =
-                            if (contract.contractStatus == ContractStatus.EXPIRED || contract.contractStatus == ContractStatus.OVERDUE) red else blue
-
-                        ContractRow("Payment Status", contract.paymentStatus.name, paymentColor)
-                        ContractRow("Contract Status", contract.contractStatus.name, statusColor)
-
-                        if (contract.returnCarStatus != null ) {
-                            if (contract.returnCarStatus == ReturnCarStatus.INTACT) {
-                                ContractRow(
-                                    "Return Car Status",
-                                    contract.returnCarStatus.name,
-                                    blue
-                                )
-                            } else if (contract.returnCarStatus == ReturnCarStatus.DAMAGED ||
-                                contract.returnCarStatus == ReturnCarStatus.LOST ||
-                                contract.returnCarStatus == ReturnCarStatus.NOT_RETURNED
-                            ) {
-                                ContractRow("Return Car Status", contract.returnCarStatus.name, red)
-                            }
-                        }
-                        ContractRow("Total Price", "$${contract.totalPrice.toInt()}")
-
-                        ContractRow("Deposit", "$${contract.deposit.toInt()}")
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        if (contract.contractStatus == ContractStatus.COMPLETE && contract.returnCarStatus != ReturnCarStatus.LOST) {
-                            CustomButton(
-                                backgroundColor = blue,
-                                text = "Review Now",
-                                textColor = 0xFFFFFFFF,
-                                onClickChange = { vm.onReviewClick(contract.id) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        } else if (contract.paymentStatus == PaymentStatus.FAILED) {
-                            CustomButton(
-                                backgroundColor = blue,
-                                text = "Retry",
-                                textColor = 0xFFFFFFFF,
-                                onClickChange = { vm.retryContract(contract.id, contract.carId, onCheckoutNav) },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                        if (contract.contractStatus == ContractStatus.PICKED_UP) {
-                            CustomButton(
-                                backgroundColor = red,
-                                text = "Report Lost",
-                                textColor = 0xFFFFFFFF,
-                                onClickChange = {
-                                    lostContractId.value = contract.id
-                                    showConfirmDialog.value = true
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                        val tomorrow = LocalDate.now().plusDays(1)
-                        if (contract.endDate == tomorrow && contract.contractStatus == ContractStatus.PICKED_UP) {
-                            ExtendContractSection(contract.id, vm, blue)
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
+        HorizontalPager(
+            state = pagerState,
+            contentPadding = PaddingValues(horizontal = 32.dp),
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            val contract = contracts[page]
+            ContractCard(
+                contract = contract,
+                vm = vm,
+                blue = blue,
+                red = red,
+                dateFormatter = dateFormatter,
+                onCheckoutNav = onCheckoutNav,
+                onReportLostClick = {
+                    lostContractId.value = contract.id
+                    showConfirmDialog.value = true
                 }
-            }
+            )
         }
     }
     if (showDialog.value) {
@@ -203,6 +118,115 @@ fun ContractScreen(
                 showConfirmDialog.value = false
             }
         )
+    }
+}
+@Composable
+fun ContractCard(
+    contract: Contract,
+    vm: ContractViewModel,
+    blue: Color,
+    red: Color,
+    dateFormatter: DateTimeFormatter,
+    onCheckoutNav: (String, String, Long?) -> Unit,
+    onReportLostClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(12.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
+        colors = CardDefaults.cardColors(Color(0xFFF7F7F9))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = contract.carId.uppercase(),
+                fontFamily = FontFamily(Font(R.font.montserrat_bold)),
+                fontSize = 16.sp,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            AsyncImage(
+                model = contract.carImageUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Fit
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            ContractRow("Contract Date", contract.contractDate.atZone(ZoneId.systemDefault()).toLocalDate().format(dateFormatter))
+            ContractRow("Start From", contract.startDate.format(dateFormatter))
+            ContractRow("End At", contract.endDate.format(dateFormatter))
+
+            val paymentColor =
+                if (contract.paymentStatus == PaymentStatus.SUCCESS) blue else red
+            val statusColor =
+                if (contract.contractStatus == ContractStatus.EXPIRED || contract.contractStatus == ContractStatus.OVERDUE) red else blue
+
+            ContractRow("Payment Status", contract.paymentStatus.name, paymentColor)
+            ContractRow("Contract Status", contract.contractStatus.name, statusColor)
+            if (contract.returnCarStatus != null ) {
+                if (contract.returnCarStatus == ReturnCarStatus.INTACT) {
+                    ContractRow(
+                        "Return Car Status",
+                        contract.returnCarStatus.name,
+                        blue
+                    )
+                } else if (contract.returnCarStatus == ReturnCarStatus.DAMAGED ||
+                    contract.returnCarStatus == ReturnCarStatus.LOST ||
+                    contract.returnCarStatus == ReturnCarStatus.NOT_RETURNED
+                ) {
+                    ContractRow("Return Car Status", contract.returnCarStatus.name, red)
+                }
+            }
+            ContractRow("Total Price", "$${contract.totalPrice.toInt()}")
+
+            ContractRow("Deposit", "$${contract.deposit.toInt()}")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (contract.contractStatus == ContractStatus.COMPLETE && contract.returnCarStatus != ReturnCarStatus.LOST) {
+                CustomButton(
+                    backgroundColor = blue,
+                    text = "Review Now",
+                    textColor = 0xFFFFFFFF,
+                    onClickChange = { vm.onReviewClick(contract.id) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else if (contract.paymentStatus == PaymentStatus.FAILED) {
+                CustomButton(
+                    backgroundColor = blue,
+                    text = "Retry",
+                    textColor = 0xFFFFFFFF,
+                    onClickChange = { vm.retryContract(contract.id, contract.carId, onCheckoutNav) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            if (contract.contractStatus == ContractStatus.PICKED_UP) {
+                CustomButton(
+                    backgroundColor = red,
+                    text = "Report Lost",
+                    textColor = 0xFFFFFFFF,
+                    onClickChange = {
+                        onReportLostClick()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            val tomorrow = LocalDate.now().plusDays(1)
+            if (contract.endDate == tomorrow && contract.contractStatus == ContractStatus.PICKED_UP) {
+                ExtendContractSection(contract.id, vm, blue)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
     }
 }
 @Composable
