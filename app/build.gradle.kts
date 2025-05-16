@@ -42,6 +42,8 @@ android {
 }
 
 dependencies {
+    //HorizontalPager
+    implementation ("com.google.accompanist:accompanist-pager:0.34.0")
     //LocalDate
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
     //firebase dependencies
