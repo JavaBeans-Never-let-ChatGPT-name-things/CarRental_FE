@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.sp
 import com.example.carrental_fe.R
 
 @Composable
-fun InputField(value:String, placeHolder:String, onValueChange:(String) -> Unit, modifier: Modifier = Modifier
-               ,editable: Boolean = true, inputType: String = "text") {
+fun InputField(value: String, placeHolder:String, onValueChange:(String) -> Unit = {_ ->},
+               editable: Boolean = true, inputType: String = "text") {
     val keyboardOptions = when (inputType.lowercase()) {
         "number" -> KeyboardOptions(keyboardType = KeyboardType.Number)
         else -> KeyboardOptions.Default
@@ -170,7 +170,7 @@ fun BackButton(
     }
 }
 @Composable
-fun InputLabel(text: String, @DrawableRes drawable: Int) {
+fun InputLabel(text: String, @DrawableRes drawable: Int, color: Color = Color.Black) {
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -184,7 +184,7 @@ fun InputLabel(text: String, @DrawableRes drawable: Int) {
             fontFamily = FontFamily(Font(R.font.montserrat_medium)),
             text = text,
             fontSize = 14.sp,
-            color = Color.Black,
+            color = color,
             fontWeight = FontWeight.Bold
         )
     }

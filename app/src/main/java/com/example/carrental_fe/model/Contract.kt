@@ -13,6 +13,7 @@ import java.time.LocalDate
 data class Contract (
     val id: Long,
     val carId: String,
+    val customerName: String,
     val carImageUrl: String,
     @Serializable(with = LocalDateSerializer::class)
     val startDate: LocalDate,
@@ -22,6 +23,8 @@ data class Contract (
     val contractDate: Instant,
     val contractStatus: ContractStatus,
     val paymentStatus: PaymentStatus,
+    val pending: Boolean,
+    val employeeName: String?,
     val returnCarStatus: ReturnCarStatus?,
     val deposit: Float,
     val totalPrice: Float
