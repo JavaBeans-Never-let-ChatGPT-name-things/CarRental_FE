@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.carrental_fe.network.AccountApi
 import com.example.carrental_fe.network.AuthApi
 import com.example.carrental_fe.network.CarApi
+import com.example.carrental_fe.network.EmployeeApi
 import com.example.carrental_fe.network.NotificationApi
 import com.example.carrental_fe.network.PayOsApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -18,6 +19,7 @@ interface AppContainer {
     val accountRepository: AccountRepository
     val payOsRepository: PayOsRepository
     val notificationRepository: NotificationRepository
+    val employeeRepository: EmployeeRepository
 }
 
 class DefaultAppContainer(context: Context) : AppContainer {
@@ -45,6 +47,12 @@ class DefaultAppContainer(context: Context) : AppContainer {
     private val accountApi: AccountApi = updatedRetrofit.create(AccountApi::class.java)
     private val payOsApi: PayOsApi = updatedRetrofit.create(PayOsApi::class.java)
     private val notificationApi: NotificationApi = updatedRetrofit.create(NotificationApi::class.java)
+    private val employeeApi: EmployeeApi = updatedRetrofit.create(EmployeeApi::class.java)
+
+    override val employeeRepository: EmployeeRepository by lazy {
+        EmployeeRepositoryImpl(employeeApi)
+    }
+
 
     override val authenticationRepository: AuthenticationRepository by lazy {
         AuthenticationRepositoryImpl(authApi)
