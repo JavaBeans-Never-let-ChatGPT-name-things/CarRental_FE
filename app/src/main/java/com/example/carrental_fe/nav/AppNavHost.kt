@@ -1,4 +1,5 @@
 package com.example.carrental_fe.nav
+
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -9,11 +10,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.carrental_fe.dto.response.TokenResponse
-import com.example.carrental_fe.screen.user.UserRoute
+import com.example.carrental_fe.screen.admin.AdminRoute
+import com.example.carrental_fe.screen.admin.adminUserDetail.UserDetailScreen
+import com.example.carrental_fe.screen.employee.EmployeeRoute
 import com.example.carrental_fe.screen.forgot.ForgotPasswordScreen
 import com.example.carrental_fe.screen.login.LoginScreen
 import com.example.carrental_fe.screen.resetPassword.ResetPasswordScreen
 import com.example.carrental_fe.screen.signup.RegisterScreen
+import com.example.carrental_fe.screen.user.UserRoute
 import com.example.carrental_fe.screen.user.userCarDetail.CarDetailScreen
 import com.example.carrental_fe.screen.user.userCheckout.PaymentWebViewScreen
 import com.example.carrental_fe.screen.user.userContractDetail.ContractDetailsScreen
@@ -21,6 +25,7 @@ import com.example.carrental_fe.screen.user.userEditProfile.EditProfileScreen
 import com.example.carrental_fe.screen.user.userSearchScreen.SearchScreen
 import com.example.carrental_fe.screen.verify.VerifyAccountScreen
 import kotlinx.serialization.Serializable
+
 @Serializable
 object Login
 
@@ -43,6 +48,9 @@ data object User
 data object Admin
 
 @Serializable
+data object Employee
+
+@Serializable
 object Search
 
 @Serializable
@@ -55,7 +63,10 @@ data class CarDetail(val carId: String? = null)
 data class ContractDetail(val carPrice: Float? = null, val carId: String? = null)
 
 @Serializable
-data class PaymentWebView(val url: String? = null, val carId: String? = null, val contractId: Long? = null, val isRetry : Boolean?)
+data class UserDetail(val displayName: String? = null)
+
+@Serializable
+data class PaymentWebView(val url: String? = null, val carId: String? = null, val contractId: Long? = null, val isRetry: Boolean?)
 @Composable
 fun AppNavHost (navController: NavHostController = rememberNavController())
 {
@@ -71,7 +82,7 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                 onSignUpNav = { navController.navigate(route = SignUp) },
                 onRecoveryNav =  { navController.navigate(route = ForgotPassword) },
                 onLoginSuccessNav = {
-                        token -> navController.navigate(route = if (token.role == "ADMIN") Admin else User){
+                        token -> navController.navigate(route = if (token.role == "ADMIN") Admin else if (token.role =="EMPLOYEE") Employee else User){
                     popUpTo(route = Login)
                 }
                 }
@@ -160,7 +171,19 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                 },
             )
         }
-        composable<Admin> {  }
+        composable<Admin> {
+            AdminRoute(
+                onNavigateToUserDetail = {
+                        displayName -> navController.navigate(route = UserDetail(displayName)){
+                    popUpTo(route = Admin) { inclusive = false }
+                    launchSingleTop = true
+                }
+                }
+            )
+        }
+        composable<Employee> {
+            EmployeeRoute()
+        }
         composable <Search> {
             SearchScreen(
                 onNavigateToCarDetail = { carId ->
@@ -196,6 +219,13 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
         }
         composable<PaymentWebView>{
             PaymentWebViewScreen(onBackStab = { navController.navigate(route = User)})
+        }
+        composable<UserDetail>{
+            UserDetailScreen(
+                onBackNav = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
