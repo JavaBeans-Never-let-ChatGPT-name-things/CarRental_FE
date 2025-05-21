@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.carrental_fe.screen.user.userContractScreen.ContractCard
 import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
 
 @Composable
@@ -40,6 +41,12 @@ fun ConfirmContractScreen(vm: ConfirmContractViewModel = viewModel(factory = Con
                     .verticalScroll(rememberScrollState())
                     .padding(bottom = 16.dp)
             ) {
+                ContractCard(
+                    contract = contract,
+                    role = "Employee",
+                    onConfirmPending = { vm.confirmContract(contract.id)},
+                    onRejectPending = { vm.rejectContract(contract.id) },
+                )
             }
         }
     }

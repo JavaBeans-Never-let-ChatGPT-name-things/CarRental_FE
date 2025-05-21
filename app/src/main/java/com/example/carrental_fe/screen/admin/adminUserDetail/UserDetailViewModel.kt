@@ -13,12 +13,15 @@ import androidx.navigation.toRoute
 import com.example.carrental_fe.CarRentalApplication
 import com.example.carrental_fe.data.AdminRepository
 import com.example.carrental_fe.dto.response.UserDetailDTO
+import com.example.carrental_fe.nav.UserDetail
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class UserDetailViewModel(private val adminRepository: AdminRepository,
                           savedStateHandle: SavedStateHandle): ViewModel() {
+    private val route = savedStateHandle.toRoute<UserDetail>()
+    private val displayName = route.displayName?:""
     private val _user = MutableStateFlow<UserDetailDTO?>(null)
     val user: StateFlow<UserDetailDTO?> = _user
     init
@@ -29,6 +32,7 @@ class UserDetailViewModel(private val adminRepository: AdminRepository,
     {
         viewModelScope.launch {
             try{
+                _user.value = adminRepository.getUserDetail(displayName)
                 Log.d("UserDetailViewModel", "User fetched: ${_user.value?.rentalContracts?.size?:0} ${_user.value?.gender}")
             }
             catch (e: Exception)
