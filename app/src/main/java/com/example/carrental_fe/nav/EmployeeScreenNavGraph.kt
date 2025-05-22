@@ -19,7 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.carrental_fe.R
+import com.example.carrental_fe.screen.employee.emplooyeeFullContract.FullContractScreen
 import com.example.carrental_fe.screen.employee.employeeContractList.ConfirmContractScreen
+import com.example.carrental_fe.screen.user.userProfile.ProfileScreen
 
 internal val defaultEmployeeRoute = EmployeeRoute.HOME
 
@@ -47,6 +49,8 @@ internal enum class EmployeeRoute(
 @Composable
 internal fun EmployeeScreenNavGraph (
     currentRoute: EmployeeRoute,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToUserProfile: () -> Unit,
     modifier: Modifier = Modifier,
 ){
     val inTransition = fadeIn(tween(durationMillis = 250)) + slideInVertically { it / 50 }
@@ -64,10 +68,13 @@ internal fun EmployeeScreenNavGraph (
                 ConfirmContractScreen()
             }
             EmployeeRoute.CONTRACTS -> {
-
+                FullContractScreen()
             }
             EmployeeRoute.PROFILE -> {
-
+                ProfileScreen(
+                    onNavigateToLogin = onNavigateToLogin,
+                    onNavigateToEditProfile =  onNavigateToUserProfile
+                )
             }
         }
     }
