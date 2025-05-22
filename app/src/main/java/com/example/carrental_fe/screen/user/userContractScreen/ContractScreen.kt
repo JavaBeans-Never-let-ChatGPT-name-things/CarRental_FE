@@ -144,7 +144,8 @@ fun ContractCard(
     onAssignContract: () -> Unit = {},
     onReportLostClick: () -> Unit = {},
     onConfirmPending: () -> Unit = {},
-    onRejectPending: () -> Unit = {}
+    onRejectPending: () -> Unit = {},
+    onConfirmReturn: () -> Unit = {}
 ) {
     val blue = Color(0xFF0D6EFD)
     val red = Color.Red
@@ -292,6 +293,16 @@ fun ContractCard(
                         text = "Confirm Picked-up",
                         textColor = 0xFFFFFFFF,
                         onClickChange = onConfirmPickUp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                if (LocalDate.now() >= contract.endDate && contract.contractStatus == ContractStatus.PICKED_UP) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    CustomButton(
+                        backgroundColor = blue,
+                        text = "Confirm Return",
+                        textColor = 0xFFFFFFFF,
+                        onClickChange = onConfirmReturn,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

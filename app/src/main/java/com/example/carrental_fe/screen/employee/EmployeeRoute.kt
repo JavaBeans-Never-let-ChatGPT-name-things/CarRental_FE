@@ -20,7 +20,10 @@ import com.example.carrental_fe.nav.EmployeeScreenNavGraph
 import com.example.carrental_fe.nav.defaultEmployeeRoute
 
 @Composable
-fun EmployeeRoute() {
+fun EmployeeRoute(
+    onNavigateToLogin: () -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+) {
     var currentRoute by rememberSaveable { mutableStateOf(
         defaultEmployeeRoute)}
     Scaffold(
@@ -57,6 +60,8 @@ fun EmployeeRoute() {
             innerPadding->
         EmployeeScreenNavGraph(
             currentRoute = currentRoute,
+            onNavigateToUserProfile = onNavigateToEditProfile,
+            onNavigateToLogin = onNavigateToLogin,
             modifier = Modifier.padding(innerPadding)
         )
     }

@@ -31,4 +31,7 @@ interface EmployeeApi {
         @Path("contractId") contractId: Long,
         @Body returnCarStatus: ReturnCarStatus
     ): MessageResponse
+
+    @GET("api/employee-contract-management/get-employee-contracts")
+    suspend fun getEmployeeContracts(): List<Contract>
 }

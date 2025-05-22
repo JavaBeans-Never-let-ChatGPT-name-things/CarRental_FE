@@ -24,4 +24,6 @@ class EmployeeRepositoryImpl (private val employeeApi: EmployeeApi) : EmployeeRe
         returnCarStatus: ReturnCarStatus
     ): MessageResponse
             = employeeApi.confirmReturn(contractId, returnCarStatus)
+    override suspend fun getEmployeeContracts(): List<Contract>
+            = employeeApi.getEmployeeContracts()
 }
