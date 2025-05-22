@@ -19,4 +19,5 @@ interface EmployeeRepository {
         contractId: Long,
         returnCarStatus: ReturnCarStatus
     ): MessageResponse
+    suspend fun getEmployeeContracts(): List<Contract>
 }

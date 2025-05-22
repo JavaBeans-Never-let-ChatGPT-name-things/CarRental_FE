@@ -182,7 +182,19 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
             )
         }
         composable<Employee> {
-            EmployeeRoute()
+            EmployeeRoute(
+                onNavigateToLogin = {
+                    navController.navigate(route = Login) {
+                        popUpTo(route = User) { inclusive = true }
+                    }
+                },
+                onNavigateToEditProfile = {
+                    navController.navigate(route = EditProfile) {
+                        popUpTo(route = User) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
         composable <Search> {
             SearchScreen(
