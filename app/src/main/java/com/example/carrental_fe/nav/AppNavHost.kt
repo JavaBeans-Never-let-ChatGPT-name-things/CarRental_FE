@@ -57,7 +57,7 @@ object Search
 object EditProfile
 
 @Serializable
-data class CarDetail(val carId: String? = null)
+data class CarDetail(val role: String? = null, val carId: String? = null)
 
 @Serializable
 data class ContractDetail(val carPrice: Float? = null, val carId: String? = null)
@@ -146,7 +146,7 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                     }
                 },
                 onNavigateToCarDetail = { carId ->
-                    navController.navigate(route = CarDetail(carId)) {
+                    navController.navigate(route = CarDetail(role = "User", carId = carId)) {
                         popUpTo(route = User) { inclusive = false }
                         launchSingleTop = true
                     }
@@ -178,7 +178,24 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                     popUpTo(route = Admin) { inclusive = false }
                     launchSingleTop = true
                 }
-                }
+                },
+                onNavigateToCarDetail = { carId ->
+                    navController.navigate(route = CarDetail(role = "Admin", carId = carId)) {
+                        popUpTo(route = User) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToEditProfile = {
+                    navController.navigate(route = EditProfile) {
+                        popUpTo(route = Admin) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToLogin = {
+                    navController.navigate(route = Login) {
+                        popUpTo(route = Admin) { inclusive = true }
+                    }
+                },
             )
         }
         composable<Employee> {
