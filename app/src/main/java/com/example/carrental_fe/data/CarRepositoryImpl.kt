@@ -47,4 +47,11 @@ class CarRepositoryImpl (private val carApi: CarApi): CarRepository {
 
     override suspend fun getCarDetail(carId: String): Response<Car>
             = carApi.getCarDetail(carId)
+
+    override suspend fun getCarBrandByName(): List<String>
+            = carApi.getCarBrandByName()
+
+    override suspend fun getAllCarsName(): List<String>
+            = carApi.getAllCarsName()
+
 }

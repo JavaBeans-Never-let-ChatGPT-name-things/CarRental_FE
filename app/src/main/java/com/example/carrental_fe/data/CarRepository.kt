@@ -19,4 +19,6 @@ interface CarRepository {
     suspend fun getFilterCarPageByBrand(carPageRequestDTO: CarPageRequestDTO, carId: String): Response<List<Car>>
     suspend fun getCarReviews(carId: String): Response<List<Review>>
     suspend fun getCarDetail(carId: String): Response<Car>
+    suspend fun getCarBrandByName(): List<String>
+    suspend fun getAllCarsName(): List<String>
 }
