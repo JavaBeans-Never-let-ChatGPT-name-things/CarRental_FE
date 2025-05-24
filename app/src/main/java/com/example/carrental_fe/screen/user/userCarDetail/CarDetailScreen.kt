@@ -53,6 +53,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.carrental_fe.R
 import com.example.carrental_fe.model.Review
+import com.example.carrental_fe.model.enums.CarState
 import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
 
@@ -162,6 +163,21 @@ fun CarDetailScreen(
                     ReviewCard(review)
                 }
             }
+        }
+
+        if (viewModel.role == "User"  && car.value?.state == CarState.AVAILABLE)
+        {
+            CustomButton(
+                backgroundColor = Color(0xFF0D6EFD),
+                text = "RENT NOW",
+                textColor = 0xFFFFFFFF,
+                onClickChange = {
+                    onContractNav(car.value?.rentalPrice?:0f,car.value?.id?:"")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
         }
 
         CustomButton(

@@ -52,8 +52,9 @@ import com.example.carrental_fe.model.enums.CarState
 @Composable
 fun CarCard(
     car: Car,
-    isFavorite: Boolean,
-    onFavoriteClick: () -> Unit,
+    isFavorite: Boolean = false,
+    role: String = "user",
+    onFavoriteClick: () -> Unit = {},
     onCarCardClick: ()-> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -64,7 +65,7 @@ fun CarCard(
             .padding(16.dp)
             .width(372.dp)
             .clickable{
-                if(car.state == CarState.AVAILABLE) onCarCardClick()
+                onCarCardClick()
             }
     ) {
         Column {
@@ -79,22 +80,25 @@ fun CarCard(
                         letterSpacing = 1.sp
                     )
                 )
-                Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() }
-                        ) {
-                            onFavoriteClick()
-                        }
-                ) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                        contentDescription = "Favorite",
-                        tint = if (isFavorite) Color.Red else Color.LightGray,
-                        modifier = Modifier.fillMaxSize()
-                    )
+                if (role == "User")
+                {
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            ) {
+                                onFavoriteClick()
+                            }
+                    ) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                            contentDescription = "Favorite",
+                            tint = if (isFavorite) Color.Red else Color.LightGray,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
 

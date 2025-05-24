@@ -22,6 +22,9 @@ import com.example.carrental_fe.nav.defaultAdminRoute
 @Composable
 fun AdminRoute(
     onNavigateToUserDetail: (String) -> Unit,
+    onNavigateToCarDetail: (String) -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToLogin: () -> Unit,
 ){
     var currentRoute by rememberSaveable { mutableStateOf(
         defaultAdminRoute
@@ -61,6 +64,9 @@ fun AdminRoute(
         AdminScreenNavGraph(
             currentRoute = currentRoute,
             onNavigateToUserDetail = onNavigateToUserDetail,
+            onNavigateToCarDetail = onNavigateToCarDetail,
+            onNavigateToEditProfile = onNavigateToEditProfile,
+            onNavigateToLogin = onNavigateToLogin,
             modifier = Modifier.padding(innerPadding)
         )
     }

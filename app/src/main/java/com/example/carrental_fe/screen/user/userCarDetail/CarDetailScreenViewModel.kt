@@ -22,6 +22,7 @@ class CarDetailViewModel (private val carRepository: CarRepository,
                           savedStateHandle: SavedStateHandle) : ViewModel() {
     private val route = savedStateHandle.toRoute<CarDetail>()
     private val _car = MutableStateFlow<Car?>(null)
+    val role = route.role
     val car = _car.asStateFlow()
     private val _reviewList = MutableStateFlow<List<Review>>(emptyList())
     val reviewList = _reviewList.asStateFlow()

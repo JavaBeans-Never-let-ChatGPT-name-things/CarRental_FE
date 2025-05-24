@@ -53,4 +53,10 @@ interface CarApi {
 
     @GET("/api/cars/{carId}")
     suspend fun getCarDetail(@Path("carId") carId: String): Response<Car>
+
+    @GET("api/cars/brands/names")
+    suspend fun getCarBrandByName(): List<String>
+
+    @GET("api/cars/")
+    suspend fun getAllCarsName(): List<String>
 }

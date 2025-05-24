@@ -4,6 +4,7 @@ import com.example.carrental_fe.dto.response.MessageResponse
 import com.example.carrental_fe.dto.response.UserDTO
 import com.example.carrental_fe.dto.response.UserDetailDTO
 import com.example.carrental_fe.model.Contract
+import java.io.File
 
 interface AdminRepository {
     suspend fun getUserList(
@@ -34,4 +35,22 @@ interface AdminRepository {
     suspend fun getAvailableEmployees(
         contractId: Long
     ): List<String>
+
+    suspend fun addCarBrand(
+        name: String,
+        logo: File?
+    ): MessageResponse
+
+    suspend fun addCar(
+        id: String,
+        brandName: String,
+        maxSpeed: Float,
+        carRange: Float,
+        carImage: File?,
+        seatsNumber: Int,
+        rentalPrice: Float,
+        engineType: String,
+        gearType: String,
+        drive: String,
+    ): MessageResponse
 }

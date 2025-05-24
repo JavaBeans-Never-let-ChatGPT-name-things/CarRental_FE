@@ -12,17 +12,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Assessment
+import androidx.compose.material.icons.outlined.DirectionsCar
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.carrental_fe.R
+import com.example.carrental_fe.screen.admin.adminCarManagement.CarManagementScreen
 import com.example.carrental_fe.screen.admin.adminContractList.PendingContractScreen
 import com.example.carrental_fe.screen.admin.adminUserList.UserListScreen
+import com.example.carrental_fe.screen.user.userProfile.ProfileScreen
 
 internal val defaultAdminRoute = AdminRoute.CONTRACTS
 
@@ -41,6 +45,11 @@ internal enum class AdminRoute(
         Icons.Outlined.People,
         Icons.Filled.People
     ),
+    CAR(
+        R.string.car_label,
+        Icons.Outlined.DirectionsCar,
+        Icons.Filled.DirectionsCar
+    ),
     ANALYTICS(
         R.string.analytics,
         Icons.Outlined.Assessment,
@@ -56,6 +65,9 @@ internal enum class AdminRoute(
 internal fun AdminScreenNavGraph (
     currentRoute: AdminRoute,
     onNavigateToUserDetail: (String) -> Unit,
+    onNavigateToCarDetail: (String) -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ){
     val inTransition = fadeIn(tween(durationMillis = 250)) + slideInVertically { it / 50 }
@@ -77,12 +89,20 @@ internal fun AdminScreenNavGraph (
                     onNavigateToUserDetail = onNavigateToUserDetail
                 )
             }
+            AdminRoute.CAR -> {
+                CarManagementScreen(
+                    onNavigateToCarDetail = onNavigateToCarDetail
+                )
+            }
 
             AdminRoute.ANALYTICS -> {
 
             }
             AdminRoute.PROFILE -> {
-
+                ProfileScreen(
+                    onNavigateToEditProfile = onNavigateToEditProfile,
+                    onNavigateToLogin = onNavigateToLogin,
+                )
             }
         }
     }

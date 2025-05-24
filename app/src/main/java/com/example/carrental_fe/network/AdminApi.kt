@@ -4,9 +4,13 @@ import com.example.carrental_fe.dto.response.MessageResponse
 import com.example.carrental_fe.dto.response.UserDTO
 import com.example.carrental_fe.dto.response.UserDetailDTO
 import com.example.carrental_fe.model.Contract
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -42,8 +46,31 @@ interface AdminApi {
         @Path("employeeName") employeeName: String
     ): MessageResponse
 
-    @GET("/api/user-management/employees/available/{contractId}")
+    @GET("api/user-management/employees/available/{contractId}")
     suspend fun getAvailableEmployees(
         @Path("contractId") contractId: Long
     ): List<String>
+
+    @Multipart
+    @POST("api/admin/cars/add/carBrand")
+    suspend fun addCarBrand(
+        @Part("name") name: RequestBody,
+        @Part logo: MultipartBody.Part? = null
+    ): MessageResponse
+
+    @Multipart
+    @POST("api/admin/cars/add")
+    suspend fun addCar(
+        @Part("id") id: RequestBody,
+        @Part("brandName") brandName: RequestBody,
+        @Part("maxSpeed") maxSpeed: RequestBody,
+        @Part("carRange") carRange: RequestBody,
+        @Part carImage: MultipartBody.Part? = null,
+        @Part("seatsNumber") seatsNumber: RequestBody,
+        @Part("rentalPrice") rentalPrice: RequestBody,
+        @Part("engineType") engineType: RequestBody,
+        @Part("gearType") gearType: RequestBody,
+        @Part("drive") drive: RequestBody,
+    ): MessageResponse
+
 }
