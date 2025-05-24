@@ -42,6 +42,8 @@ android {
 }
 
 dependencies {
+    //Chart dependencies
+    implementation ("com.github.PhilJay:MPAndroidChart:3.1.0")
     //HorizontalPager
     implementation ("com.google.accompanist:accompanist-pager:0.34.0")
     //LocalDate
