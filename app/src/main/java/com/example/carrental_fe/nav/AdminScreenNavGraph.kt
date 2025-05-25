@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.carrental_fe.R
+import com.example.carrental_fe.screen.admin.adminAnalytics.AnalyticsScreen
 import com.example.carrental_fe.screen.admin.adminCarManagement.CarManagementScreen
 import com.example.carrental_fe.screen.admin.adminContractList.PendingContractScreen
 import com.example.carrental_fe.screen.admin.adminUserList.UserListScreen
@@ -96,7 +97,7 @@ internal fun AdminScreenNavGraph (
             }
 
             AdminRoute.ANALYTICS -> {
-
+                AnalyticsScreen()
             }
             AdminRoute.PROFILE -> {
                 ProfileScreen(
