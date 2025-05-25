@@ -1,5 +1,11 @@
 package com.example.carrental_fe.data
 
+import com.example.carrental_fe.dto.request.ReportRequestDTO
+import com.example.carrental_fe.dto.response.UserSummaryDTO
+import com.example.carrental_fe.dto.response.CarSummaryDTO
+import com.example.carrental_fe.dto.response.ContractSummaryDTO
+import com.example.carrental_fe.dto.response.MonthlyReportDTO
+import com.example.carrental_fe.dto.response.ReturnStatusDTO
 import com.example.carrental_fe.dto.response.MessageResponse
 import com.example.carrental_fe.dto.response.UserDTO
 import com.example.carrental_fe.dto.response.UserDetailDTO
@@ -93,4 +99,58 @@ class AdminRepositoryImpl(private val adminApi: AdminApi) : AdminRepository {
             drive = drivePart
         )
     }
+
+    override suspend fun getTop3BestUsers(): List<UserSummaryDTO>
+            = adminApi.getTop3BestUsers()
+
+    override suspend fun getTop3WorstUsers(): List<UserSummaryDTO>
+            = adminApi.getTop3WorstUsers()
+
+    override suspend fun getTop3BestUsersFromDateToDate(reportRequestDTO: ReportRequestDTO): List<UserSummaryDTO>
+            = adminApi.getTop3BestUsersFromDateToDate(reportRequestDTO)
+
+    override suspend fun getTop3WorstUsersFromDateToDate(reportRequestDTO: ReportRequestDTO): List<UserSummaryDTO>
+            = adminApi.getTop3WorstUsersFromDateToDate(reportRequestDTO)
+
+    override suspend fun getTop3RentedCars(): List<CarSummaryDTO>
+            = adminApi.getTop3RentedCars()
+
+    override suspend fun getTop3RentedCarsFromDateToDate(reportRequestDTO: ReportRequestDTO): List<CarSummaryDTO>
+            = adminApi.getTop3RentedCarsFromDateToDate(reportRequestDTO)
+
+    override suspend fun getTop3RatingCars(): List<CarSummaryDTO>
+            = adminApi.getTop3RatingCars()
+
+    override suspend fun getTop3RatingCarsFromDateToDate(reportRequestDTO: ReportRequestDTO): List<CarSummaryDTO>
+            = adminApi.getTop3RatingCarsFromDateToDate(reportRequestDTO)
+
+    override suspend fun getMonthlyTotalRevenue(year: Int): List<MonthlyReportDTO>
+            = adminApi.getMonthlyTotalRevenue(year)
+
+    override suspend fun getMonthlyTotalPenalty(year: Int): List<MonthlyReportDTO>
+            = adminApi.getMonthlyTotalPenalty(year)
+
+    override suspend fun getTotalRevenueFromDateToDate(reportRequestDTO: ReportRequestDTO): Double
+            = adminApi.getTotalRevenueFromDateToDate(reportRequestDTO)
+
+    override suspend fun getTotalPenaltyFromDateToDate(reportRequestDTO: ReportRequestDTO): Double
+            = adminApi.getTotalPenaltyFromDateToDate(reportRequestDTO)
+
+    override suspend fun getTotalRevenue(): Double
+            = adminApi.getTotalRevenue()
+
+    override suspend fun getTotalPenalty(): Double
+            = adminApi.getTotalPenalty()
+
+    override suspend fun getContractSummary(): List<ContractSummaryDTO>
+            = adminApi.getContractSummary()
+
+    override suspend fun getContractSummaryFromDateToDate(reportRequestDTO: ReportRequestDTO): List<ContractSummaryDTO>
+            = adminApi.getContractSummaryFromDateToDate(reportRequestDTO)
+
+    override suspend fun getReturnStatus(): List<ReturnStatusDTO>
+            = adminApi.getReturnStatus()
+
+    override suspend fun getReturnStatusFromDateToDate(reportRequestDTO: ReportRequestDTO): List<ReturnStatusDTO>
+            = adminApi.getReturnStatusFromDateToDate(reportRequestDTO)
 }
