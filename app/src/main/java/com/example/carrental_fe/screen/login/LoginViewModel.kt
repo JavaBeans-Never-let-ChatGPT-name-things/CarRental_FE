@@ -5,17 +5,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.carrental_fe.CarRentalApplication
 import com.example.carrental_fe.data.AuthenticationRepository
+import com.example.carrental_fe.data.NotificationRepository
+import com.example.carrental_fe.data.TokenManager
 import com.example.carrental_fe.dto.request.LoginRequest
 import com.example.carrental_fe.dto.response.TokenResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.carrental_fe.CarRentalApplication
-import com.example.carrental_fe.data.TokenManager
-import com.example.carrental_fe.data.NotificationRepository
-import kotlinx.coroutines.runBlocking
 import android.util.Log
 
 
@@ -39,24 +38,7 @@ class LoginViewModel (private val authenticationRepository: AuthenticationReposi
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState
-    init{
-        viewModelScope.launch {
-            val refreshToken = tokenManager.getRefreshToken()
-            if (!refreshToken.isNullOrBlank()) {
-                try {
-                    val response = authenticationRepository.refresh("Bearer $refreshToken")
-                    tokenManager.saveTokens(
-                        response.accessToken,
-                        response.refreshToken,
-                        response.role
-                    )
-                    _loginState.value = LoginState.Success(response)
-                } catch (e: Exception) {
-                    _loginState.value = LoginState.Idle
-                }
-            }
-        }
-    }
+
     fun resetState() {
         _loginState.value = LoginState.Idle
     }
