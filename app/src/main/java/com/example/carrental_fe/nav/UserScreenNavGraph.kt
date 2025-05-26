@@ -1,5 +1,6 @@
 package com.example.carrental_fe.nav
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
@@ -74,6 +75,9 @@ internal fun UserScreenNavGraph (
     currentRoute: MainRoutes,
     modifier: Modifier = Modifier
 ){
+    BackHandler {
+        onNavigateToLogin()
+    }
     val inTransition = fadeIn(tween(durationMillis = 250)) + slideInVertically { it / 50 }
     val outTransition = fadeOut(tween(durationMillis = 250))
     AnimatedContent(
