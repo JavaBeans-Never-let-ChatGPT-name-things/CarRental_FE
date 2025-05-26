@@ -12,9 +12,9 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
-import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.AssignmentLate
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.People
+import androidx.compose.material.icons.outlined.AssignmentLate
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,9 +32,9 @@ internal enum class EmployeeRoute(
     val selectedIcon: ImageVector
 ) {
     HOME(
-        R.string.userManagement_screen_label,
-        Icons.Outlined.People,
-        Icons.Filled.People
+        R.string.pending_contracts,
+        Icons.Outlined.AssignmentLate,
+        Icons.Filled.AssignmentLate
     ),
     CONTRACTS(
         R.string.contract_screen_label,
