@@ -184,11 +184,20 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                     navController.navigate(route = Login) {
                         popUpTo(route = User) { inclusive = true }
                     }
-                },
+                },onSendEmailSuccessNav = {
+                        emailForgot -> navController.navigate(route = ResetPassword(emailForgot)){
+                    launchSingleTop = true
+                }
+                }
             )
         }
         composable<Admin> {
             AdminRoute(
+                onSendEmailSuccessNav = {
+                        emailForgot -> navController.navigate(route = ResetPassword(emailForgot)){
+                    launchSingleTop = true
+                }
+                },
                 onNavigateToUserDetail = {
                         displayName -> navController.navigate(route = UserDetail(displayName)){
                     popUpTo(route = Admin) { inclusive = false }
@@ -226,6 +235,11 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                         popUpTo(route = User) { inclusive = false }
                         launchSingleTop = true
                     }
+                },
+                onSendEmailSuccessNav = {
+                        emailForgot -> navController.navigate(route = ResetPassword(emailForgot)){
+                    launchSingleTop = true
+                }
                 }
             )
         }
