@@ -72,6 +72,7 @@ internal fun UserScreenNavGraph (
     onNavigateToEditProfile: () -> Unit,
     onNavigateToCarDetail: (carId: String) -> Unit,
     onCheckoutNav: (String, String, Long?) -> Unit,
+    onSendEmailSuccessNav: (String) -> Unit,
     currentRoute: MainRoutes,
     modifier: Modifier = Modifier
 ){
@@ -113,7 +114,8 @@ internal fun UserScreenNavGraph (
             }
             MainRoutes.PROFILE -> {
                 ProfileScreen(onNavigateToEditProfile = onNavigateToEditProfile,
-                    onNavigateToLogin = onNavigateToLogin)
+                    onNavigateToLogin = onNavigateToLogin,
+                    onSendEmailSuccessNav = onSendEmailSuccessNav)
             }
         }
     }
