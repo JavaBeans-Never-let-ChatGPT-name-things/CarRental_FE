@@ -52,6 +52,7 @@ internal fun EmployeeScreenNavGraph (
     currentRoute: EmployeeRoute,
     onNavigateToLogin: () -> Unit,
     onNavigateToUserProfile: () -> Unit,
+    onSendEmailSuccessNav: (String) -> Unit,
     modifier: Modifier = Modifier,
 ){
     BackHandler {
@@ -77,7 +78,8 @@ internal fun EmployeeScreenNavGraph (
             EmployeeRoute.PROFILE -> {
                 ProfileScreen(
                     onNavigateToLogin = onNavigateToLogin,
-                    onNavigateToEditProfile =  onNavigateToUserProfile
+                    onNavigateToEditProfile =  onNavigateToUserProfile,
+                    onSendEmailSuccessNav = onSendEmailSuccessNav
                 )
             }
         }
