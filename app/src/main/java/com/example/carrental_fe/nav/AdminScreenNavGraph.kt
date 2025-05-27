@@ -70,6 +70,7 @@ internal fun AdminScreenNavGraph (
     onNavigateToCarDetail: (String) -> Unit,
     onNavigateToEditProfile: () -> Unit,
     onNavigateToLogin: () -> Unit,
+    onSendEmailSuccessNav: (String) -> Unit,
     modifier: Modifier = Modifier,
 ){
     BackHandler {
@@ -107,6 +108,7 @@ internal fun AdminScreenNavGraph (
                 ProfileScreen(
                     onNavigateToEditProfile = onNavigateToEditProfile,
                     onNavigateToLogin = onNavigateToLogin,
+                    onSendEmailSuccessNav = onSendEmailSuccessNav
                 )
             }
         }

@@ -24,6 +24,7 @@ fun AdminRoute(
     onNavigateToUserDetail: (String) -> Unit,
     onNavigateToCarDetail: (String) -> Unit,
     onNavigateToEditProfile: () -> Unit,
+    onSendEmailSuccessNav: (String) -> Unit,
     onNavigateToLogin: () -> Unit,
 ){
     var currentRoute by rememberSaveable { mutableStateOf(
@@ -67,6 +68,7 @@ fun AdminRoute(
             onNavigateToCarDetail = onNavigateToCarDetail,
             onNavigateToEditProfile = onNavigateToEditProfile,
             onNavigateToLogin = onNavigateToLogin,
+            onSendEmailSuccessNav = onSendEmailSuccessNav,
             modifier = Modifier.padding(innerPadding)
         )
     }
