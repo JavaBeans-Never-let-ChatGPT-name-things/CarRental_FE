@@ -17,6 +17,7 @@ import com.example.carrental_fe.screen.forgot.ForgotPasswordScreen
 import com.example.carrental_fe.screen.login.LoginScreen
 import com.example.carrental_fe.screen.resetPassword.ResetPasswordScreen
 import com.example.carrental_fe.screen.signup.RegisterScreen
+import com.example.carrental_fe.screen.splashScreen.SplashScreen
 import com.example.carrental_fe.screen.user.UserRoute
 import com.example.carrental_fe.screen.user.userCarDetail.CarDetailScreen
 import com.example.carrental_fe.screen.user.userCheckout.PaymentWebViewScreen
@@ -67,6 +68,8 @@ data class UserDetail(val displayName: String? = null)
 
 @Serializable
 data class PaymentWebView(val url: String? = null, val carId: String? = null, val contractId: Long? = null, val isRetry: Boolean?)
+@Serializable
+object SplashScreen
 @Composable
 fun AppNavHost (navController: NavHostController = rememberNavController())
 {
@@ -75,8 +78,21 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
         popEnterTransition = { slideInHorizontally(initialOffsetX = { fullWidth -> -fullWidth }) + fadeIn() },
         exitTransition = { slideOutHorizontally(targetOffsetX = { fullWidth -> -fullWidth }) + fadeOut() },
         popExitTransition = { slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth }) + fadeOut() },
-        startDestination = Login)
-    {
+        startDestination = SplashScreen)    {
+        composable<SplashScreen>{
+            SplashScreen(
+                onNavigateToHomeScreen = {
+                        token -> navController.navigate(route = if (token.role == "ADMIN") Admin else if (token.role =="EMPLOYEE") Employee else User) {
+                    popUpTo(route = SplashScreen) {inclusive = true}
+                }
+                },
+                onNavigateToLoginScreen = {
+                    navController.navigate(route = Login) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    }
+                }
+            )
+        }
         composable<Login> {
             LoginScreen(
                 onSignUpNav = { navController.navigate(route = SignUp) },
@@ -168,11 +184,20 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                     navController.navigate(route = Login) {
                         popUpTo(route = User) { inclusive = true }
                     }
-                },
+                },onSendEmailSuccessNav = {
+                        emailForgot -> navController.navigate(route = ResetPassword(emailForgot)){
+                    launchSingleTop = true
+                }
+                }
             )
         }
         composable<Admin> {
             AdminRoute(
+                onSendEmailSuccessNav = {
+                        emailForgot -> navController.navigate(route = ResetPassword(emailForgot)){
+                    launchSingleTop = true
+                }
+                },
                 onNavigateToUserDetail = {
                         displayName -> navController.navigate(route = UserDetail(displayName)){
                     popUpTo(route = Admin) { inclusive = false }
@@ -210,6 +235,11 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                         popUpTo(route = User) { inclusive = false }
                         launchSingleTop = true
                     }
+                },
+                onSendEmailSuccessNav = {
+                        emailForgot -> navController.navigate(route = ResetPassword(emailForgot)){
+                    launchSingleTop = true
+                }
                 }
             )
         }

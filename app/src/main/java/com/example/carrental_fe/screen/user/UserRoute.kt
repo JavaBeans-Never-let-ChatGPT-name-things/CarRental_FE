@@ -32,6 +32,7 @@ fun UserRoute(
     onNavigateToSearchScreen: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
     onNavigateToCarDetail: (String) -> Unit,
+    onSendEmailSuccessNav: (String) -> Unit,
     onCheckoutNav: (String, String, Long?) -> Unit,
     )
 {
@@ -90,6 +91,7 @@ fun UserRoute(
             onNavigateToLogin = onNavigateToLogin,
             onNavigateToEditProfile = onNavigateToEditProfile,
             onNavigateToCarDetail = onNavigateToCarDetail,
+            onSendEmailSuccessNav = onSendEmailSuccessNav,
             onCheckoutNav = onCheckoutNav,
             currentRoute = currentRoute,
             modifier = Modifier.padding(innerPadding)

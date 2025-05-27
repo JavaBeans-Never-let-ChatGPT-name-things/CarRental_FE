@@ -8,5 +8,6 @@
     <string name="userManagement_screen_label">User Management</string>
     <string name="default_notification_channel_id">Global</string>
     <string name="car_label">Cars</string>
+    <string name = "pending_contracts">Pending</string>
     <string name="analytics">Analytics</string>
 </resources>

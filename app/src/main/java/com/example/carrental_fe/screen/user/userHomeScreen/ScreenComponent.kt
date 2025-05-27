@@ -80,7 +80,7 @@ fun CarCard(
                         letterSpacing = 1.sp
                     )
                 )
-                if (role == "User")
+                if (role == "user")
                 {
                     Box(
                         modifier = Modifier

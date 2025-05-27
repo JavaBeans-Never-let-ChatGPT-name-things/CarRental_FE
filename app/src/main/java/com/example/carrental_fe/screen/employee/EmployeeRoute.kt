@@ -22,6 +22,7 @@ import com.example.carrental_fe.nav.defaultEmployeeRoute
 @Composable
 fun EmployeeRoute(
     onNavigateToLogin: () -> Unit,
+    onSendEmailSuccessNav: (String) -> Unit,
     onNavigateToEditProfile: () -> Unit,
 ) {
     var currentRoute by rememberSaveable { mutableStateOf(
@@ -62,6 +63,7 @@ fun EmployeeRoute(
             currentRoute = currentRoute,
             onNavigateToUserProfile = onNavigateToEditProfile,
             onNavigateToLogin = onNavigateToLogin,
+            onSendEmailSuccessNav = onSendEmailSuccessNav,
             modifier = Modifier.padding(innerPadding)
         )
     }

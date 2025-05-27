@@ -1,6 +1,5 @@
 package com.example.carrental_fe.screen.user.userProfile
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,13 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.carrental_fe.R
+import com.example.carrental_fe.dialog.ErrorDialog
 import com.example.carrental_fe.dialog.LoadingDialog
 import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.component.InputField
@@ -47,11 +46,13 @@ import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
 fun ProfileScreen(
     viewModel: ProfileScreenViewModel = viewModel(factory = ProfileScreenViewModel.Factory),
     onNavigateToLogin:() -> Unit,
-    onNavigateToEditProfile: () -> Unit) {
-    val context = LocalContext.current
+    onNavigateToEditProfile: () -> Unit,
+    onSendEmailSuccessNav: (String) -> Unit) {
     val accountInfo = viewModel.accountInfo.collectAsState()
     var isLoading by remember { mutableStateOf(false) }
-
+    val forgotPasswordProfileState by viewModel.forgotPasswordState.collectAsState()
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var showLoadingDialog by remember { mutableStateOf(false) }
     if (isLoading) {
         LoadingDialog(text = "Logging out ....")
     }
@@ -167,8 +168,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .align(Alignment.End)
                 .clickable {
-                    Toast.makeText(context, "Change Password clicked", Toast.LENGTH_SHORT)
-                        .show()
+                    viewModel.sendEmail()
                 }
         )
 
@@ -185,5 +185,26 @@ fun ProfileScreen(
                 }
             }
         )
+    }
+    LaunchedEffect(forgotPasswordProfileState) {
+        when (forgotPasswordProfileState) {
+            is ForgotPasswordProfileState.Loading -> showLoadingDialog = true
+            is ForgotPasswordProfileState.Error -> {
+                showLoadingDialog = false
+                showErrorDialog = true
+            }
+            is ForgotPasswordProfileState.Success -> {
+                showLoadingDialog = false
+                onSendEmailSuccessNav(accountInfo.value?.email?:"")
+            }
+            else -> showLoadingDialog = false
+        }
+    }
+    if (showLoadingDialog) {
+        LoadingDialog(text = "Sending Email To ${accountInfo.value?.email?:""} ...")
+    }
+
+    if (showErrorDialog) {
+        ErrorDialog { showErrorDialog = false }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.carrental_fe.nav
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
@@ -71,9 +72,13 @@ internal fun UserScreenNavGraph (
     onNavigateToEditProfile: () -> Unit,
     onNavigateToCarDetail: (carId: String) -> Unit,
     onCheckoutNav: (String, String, Long?) -> Unit,
+    onSendEmailSuccessNav: (String) -> Unit,
     currentRoute: MainRoutes,
     modifier: Modifier = Modifier
 ){
+    BackHandler {
+        onNavigateToLogin()
+    }
     val inTransition = fadeIn(tween(durationMillis = 250)) + slideInVertically { it / 50 }
     val outTransition = fadeOut(tween(durationMillis = 250))
     AnimatedContent(
@@ -109,7 +114,8 @@ internal fun UserScreenNavGraph (
             }
             MainRoutes.PROFILE -> {
                 ProfileScreen(onNavigateToEditProfile = onNavigateToEditProfile,
-                    onNavigateToLogin = onNavigateToLogin)
+                    onNavigateToLogin = onNavigateToLogin,
+                    onSendEmailSuccessNav = onSendEmailSuccessNav)
             }
         }
     }
