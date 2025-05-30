@@ -230,13 +230,16 @@ fun ContractCard(
                     }
 
                     contract.paymentStatus == PaymentStatus.FAILED -> {
-                        CustomButton(
-                            backgroundColor = blue,
-                            text = "Retry",
-                            textColor = 0xFFFFFFFF,
-                            onClickChange = onCheckoutNav,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        if (contract.retryCountLeft > 0 )
+                        {
+                            CustomButton(
+                                backgroundColor = blue,
+                                text = "Retry",
+                                textColor = 0xFFFFFFFF,
+                                onClickChange = onCheckoutNav,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
 
                     contract.contractStatus == ContractStatus.PICKED_UP -> {

@@ -69,12 +69,12 @@ class ContractViewModel (private val accountRepository: AccountRepository,
     fun retryContract(contractId: Long, carId: String, onCheckoutNav: (String, String, Long?) -> Unit) {
         viewModelScope.launch {
             try {
+                accountRepository.retryContract(contractId)
                 val checkoutUrl = payOsRepository.getCheckoutUrl(ItemRequest(
                     name = "Retry payment for contract with car name: $carId",
                     quantity = 1,
                     price = 2000.0
                 )).checkoutUrl
-                accountRepository.retryContract(contractId)
                 onCheckoutNav(checkoutUrl, carId, contractId)
             } catch (e: Exception) {
                 Log.e("Retry error", "Error: ${e.message}")
