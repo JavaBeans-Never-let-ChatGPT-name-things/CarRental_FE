@@ -23,6 +23,17 @@ class ContractViewModel (private val accountRepository: AccountRepository,
     val contracts: StateFlow<List<Contract>> = _contracts
     private val _showReviewDialog = MutableStateFlow(false)
     val showReviewDialog: StateFlow<Boolean> = _showReviewDialog
+    private val _filterOptions = MutableStateFlow<List<String>>(emptyList())
+    val filterOptions: StateFlow<List<String>> = _filterOptions
+
+    private val _selectedFilter = MutableStateFlow("All")
+    val selectedFilter : StateFlow<String> = _selectedFilter
+
+    private val _selectedSort = MutableStateFlow("StartDate ASC")
+    val selectedSort : StateFlow<String> = _selectedSort
+
+    private val _filteredContracts = MutableStateFlow<List<Contract>>(emptyList())
+    val filteredContracts : StateFlow<List<Contract>> = _filteredContracts
 
     private val _selectedContractId = MutableStateFlow<Long?>(null)
 
@@ -30,6 +41,9 @@ class ContractViewModel (private val accountRepository: AccountRepository,
     val reviewStars = MutableStateFlow(0)
     init {
         fetchContracts()
+        viewModelScope.launch {
+            contracts.collect { updateFilteredContracts() }
+        }
     }
 
     fun onReviewClick(contractId: Long) {
@@ -61,6 +75,7 @@ class ContractViewModel (private val accountRepository: AccountRepository,
     fun fetchContracts() {
         viewModelScope.launch {
             _contracts.value = accountRepository.getContracts()
+            _filterOptions.value = listOf("All") + _contracts.value.map { it.contractStatus.name }.distinct()
         }
     }
     fun dismissReviewDialog() {
@@ -103,6 +118,32 @@ class ContractViewModel (private val accountRepository: AccountRepository,
                 Log.e("ExtendContract error", e.message ?: "Unknown error")
             }
         }
+    }
+    fun setFilter(filter: String) {
+        _selectedFilter.value = filter
+        updateFilteredContracts()
+    }
+
+    fun setSort(sort: String) {
+        _selectedSort.value = sort
+        updateFilteredContracts()
+    }
+
+    private fun updateFilteredContracts() {
+        val currentContracts = _contracts.value
+        val filtered = if (_selectedFilter.value == "All") {
+            currentContracts
+        } else {
+            currentContracts.filter { it.contractStatus.name == _selectedFilter.value }
+        }
+
+        val sorted = when (_selectedSort.value) {
+            "StartDate ASC" -> filtered.sortedBy { it.startDate }
+            "StartDate DESC" -> filtered.sortedByDescending { it.startDate }
+            else -> filtered
+        }
+
+        _filteredContracts.value = sorted
     }
     companion object{
         val Factory: ViewModelProvider.Factory = viewModelFactory {
