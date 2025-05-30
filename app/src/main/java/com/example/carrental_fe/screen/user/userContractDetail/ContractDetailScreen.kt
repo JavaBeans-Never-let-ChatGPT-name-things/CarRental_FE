@@ -47,6 +47,7 @@ import com.example.carrental_fe.R
 import com.example.carrental_fe.dialog.ErrorDialog
 import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
+import com.example.carrental_fe.dialog.SuccessDialog
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -55,7 +56,8 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ContractDetailsScreen(
     onCheckoutNav: (String, String, Long) -> Unit,
-    vm: ContractDetailViewModel = viewModel(factory = ContractDetailViewModel.Factory)) {
+    vm: ContractDetailViewModel = viewModel(factory = ContractDetailViewModel.Factory),
+    onCheckoutComplete: () -> Unit) {
     val startDate = vm.startDate.collectAsState()
     val endDate = vm.endDate.collectAsState()
     val dateDiff = vm.dateDiff.collectAsState()
@@ -63,6 +65,15 @@ fun ContractDetailsScreen(
     val totalPrice = vm.totalPrice.collectAsState()
     val showError = remember { mutableStateOf(false) }
     val errorMessage = remember { mutableStateOf("") }
+    vm.paymentStatus?.let {
+        if (it == "success"){
+            SuccessDialog(text = "Successfully Booked ${vm.carId}", onDismiss = { onCheckoutComplete() })
+        }
+        else
+        {
+            ErrorDialog(text = "Payment Failed", onDismiss = { onCheckoutComplete() })
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
