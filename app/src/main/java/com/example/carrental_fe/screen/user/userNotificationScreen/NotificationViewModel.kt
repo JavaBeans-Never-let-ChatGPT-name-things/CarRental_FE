@@ -27,9 +27,17 @@ class NotificationViewModel(private val repository: NotificationRepository) : Vi
     val unreadNotificationCount = notifications.map { list -> list.count { !it.isRead } }.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(), 0
     )
+    private val _isSuccess = MutableStateFlow(false)
+    val isSuccess = _isSuccess.asStateFlow()
+    private val _isFailed = MutableStateFlow(false)
+    val isFailed = _isFailed.asStateFlow()
 
     init {
         fetchNotifications()
+    }
+
+    fun dismissSuccessDialog() {
+        _isSuccess.value = false
     }
 
     fun fetchNotifications() {
@@ -38,8 +46,19 @@ class NotificationViewModel(private val repository: NotificationRepository) : Vi
         }
     }
 
-    fun markEnteredScreen() {
-        _hasEnteredScreen.value = true
+    fun dismissErrorDialog() {
+        _isFailed.value = false
+    }
+    fun deleteAllNotifications() {
+        viewModelScope.launch {
+            try {
+                repository.deleteAllNotifications()
+                _notifications.value = emptyList()
+                _isSuccess.value = true
+            } catch (e: Exception) {
+                _isFailed.value = true
+            }
+        }
     }
 
     fun markAllAsRead() {
