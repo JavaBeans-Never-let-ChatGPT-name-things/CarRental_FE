@@ -35,6 +35,9 @@ class EditProfileViewModel(private val accountRepository: AccountRepository): Vi
     private val _avatarUrl = MutableStateFlow<String?>(null)
     val avatarUrl = _avatarUrl.asStateFlow()
 
+    private val  _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
     fun setInitialData() {
         viewModelScope.launch {
             val account = accountRepository.getAccount().body()
@@ -74,6 +77,7 @@ class EditProfileViewModel(private val accountRepository: AccountRepository): Vi
     fun saveProfile(onBackNav:()-> Unit) {
         viewModelScope.launch {
             try {
+                _isLoading.value = true
                 val result = accountRepository.updateProfile(
                     email = _email.value,
                     displayName = _displayName.value,
@@ -87,7 +91,7 @@ class EditProfileViewModel(private val accountRepository: AccountRepository): Vi
                 }
             } catch (e: Exception) {
             } finally {
-
+                _isLoading.value = false
             }
         }
     }
