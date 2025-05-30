@@ -7,4 +7,5 @@ interface NotificationRepository {
     suspend fun registerToken(fcmToken: String): String
     suspend fun getNotifications() : List<Notification>
     suspend fun  readAllNotifications(): MessageResponse
+    suspend fun deleteAllNotifications(): MessageResponse
 }
