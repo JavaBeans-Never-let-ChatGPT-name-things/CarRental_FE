@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -132,41 +133,48 @@ fun CarManagementScreen(
             .fillMaxSize()
             .background(Color.White)
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Title
+
         item {
             TopTitle("Car Manage")
         }
 
-        // --- Add Brand ---
+
         item {
-            Card(elevation = CardDefaults.cardElevation(4.dp), modifier = Modifier.fillMaxWidth()) {
+            Card(
+                    elevation = CardDefaults.cardElevation(4.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F7F9)),
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Add Car Brand", fontWeight = FontWeight.Bold)
-                    OutlinedTextField(
-                        value = newBrandName,
-                        onValueChange = { newBrandName = it },
-                        label = { Text("Brand Name") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    // placeholder image box
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .background(Color.LightGray, RoundedCornerShape(8.dp))
-                            .clickable { pickBrandLogo.launch("image/*") },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (newBrandLogo != null) {
-                            AsyncImage(
-                                model = newBrandLogo,
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Text("Logo", color = Color.DarkGray)
+                    Row(modifier = Modifier.wrapContentSize(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically){
+                        OutlinedTextField(
+                            value = newBrandName,
+                            onValueChange = { newBrandName = it },
+                            label = { Text("Brand Name") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .background(Color.LightGray, RoundedCornerShape(8.dp))
+                                .clickable { pickBrandLogo.launch("image/*") },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (newBrandLogo != null) {
+                                AsyncImage(
+                                    model = newBrandLogo,
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Fit
+                                )
+                            } else {
+                                Text("Logo", fontFamily = FontFamily(Font(R.font.montserrat_medium)) , color = Color.DarkGray)
+                            }
                         }
                     }
                     CustomButton(
@@ -191,11 +199,32 @@ fun CarManagementScreen(
             }
         }
 
-        // --- Add Car ---
+
         item {
-            Card(elevation = CardDefaults.cardElevation(4.dp), modifier = Modifier.fillMaxWidth()) {
+            Card(elevation = CardDefaults.cardElevation(4.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F7F9)),
+                modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Add Car", fontWeight = FontWeight.Bold)
+                    Box(
+                            modifier = Modifier
+                            .height(120.dp)
+                        .fillMaxWidth()
+                        .background(Color.LightGray, RoundedCornerShape(8.dp))
+                        .clickable { pickCarImage.launch("image/*") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (newCarImage != null) {
+                            AsyncImage(
+                                model = newCarImage,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                        } else {
+                            Text("Car Image", fontFamily = FontFamily(Font(R.font.montserrat_medium)) , color = Color.DarkGray)
+                        }
+                    }
                     OutlinedTextField(
                         value = newCarId,
                         onValueChange = { newCarId = it },
@@ -237,26 +266,6 @@ fun CarManagementScreen(
                         }
                     }
 
-                    // car image placeholder
-                    Box(
-                        modifier = Modifier
-                            .height(120.dp)
-                            .fillMaxWidth()
-                            .background(Color.LightGray, RoundedCornerShape(8.dp))
-                            .clickable { pickCarImage.launch("image/*") },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (newCarImage != null) {
-                            AsyncImage(
-                                model = newCarImage,
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Text("Car Image", color = Color.DarkGray)
-                        }
-                    }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
