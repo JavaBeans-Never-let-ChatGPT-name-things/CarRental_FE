@@ -13,4 +13,7 @@ class NotificationRepositoryImpl (private val notificationApi: NotificationApi):
 
     override suspend fun readAllNotifications(): MessageResponse
             = notificationApi.readAllNotifications()
+
+    override suspend fun deleteAllNotifications(): MessageResponse
+    = notificationApi.deleteAllNotifications()
 }

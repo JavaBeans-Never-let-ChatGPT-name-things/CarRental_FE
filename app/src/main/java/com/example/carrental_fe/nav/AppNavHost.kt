@@ -61,7 +61,7 @@ object EditProfile
 data class CarDetail(val role: String? = null, val carId: String? = null)
 
 @Serializable
-data class ContractDetail(val carPrice: Float? = null, val carId: String? = null)
+data class ContractDetail(val carPrice: Float? = null, val carId: String? = null, val paymentStatus: String? = null)
 
 @Serializable
 data class UserDetail(val displayName: String? = null)
@@ -150,6 +150,7 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
         }
         composable<User> {
             UserRoute(
+                navController = navController,
                 onNavigateToSearchScreen = {
                     navController.navigate(route = Search) {
                         popUpTo(route = User) { inclusive = false }
@@ -273,11 +274,37 @@ fun AppNavHost (navController: NavHostController = rememberNavController())
                     popUpTo(route = ContractDetail(carId = carId)) { inclusive = false }
                     launchSingleTop = true
                 }
+                },
+                onCheckoutComplete = {
+                    navController.navigate(route=User)
                 }
             )
         }
         composable<PaymentWebView>{
-            PaymentWebViewScreen(onBackStab = { navController.navigate(route = User)})
+            PaymentWebViewScreen(
+                    onBackStab = {
+                    carId, carPrice, isRetry, status ->
+                if (!isRetry!!)
+                {
+                    navController.navigate(
+                        route = ContractDetail(carPrice = carPrice, carId = carId, paymentStatus = status)
+                    )
+                }
+                else
+                {
+                    navController.navigate(
+                        route = User
+                    ){
+                        popUpTo(route = PaymentWebView(carId = carId, url = "", contractId = 0L, isRetry = true)) {
+                            inclusive = true
+                        }
+                    }
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("retryPaymentStatus", status)
+                }
+            }
+            )
         }
         composable<UserDetail>{
             UserDetailScreen(

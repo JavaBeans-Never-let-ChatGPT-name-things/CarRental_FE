@@ -39,6 +39,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.carrental_fe.R
+import com.example.carrental_fe.dialog.LoadingDialog
 import com.example.carrental_fe.screen.component.BackButton
 import com.example.carrental_fe.screen.component.CustomButton
 import com.example.carrental_fe.screen.component.InputField
@@ -57,6 +58,7 @@ fun EditProfileScreen(
     val gender by viewModel.gender.collectAsState()
     val avatarFile by viewModel.avatarFile.collectAsState()
     val avatarUrl by viewModel.avatarUrl.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val context = LocalContext.current
     // Chọn ảnh
     val imageLauncher = rememberLauncherForActivityResult(
@@ -66,6 +68,10 @@ fun EditProfileScreen(
             val file = uriToFile(uri, context)
             viewModel.onAvatarSelected(file)
         }
+    }
+    if (isLoading)
+    {
+        LoadingDialog()
     }
     LaunchedEffect(Unit) {
         viewModel.setInitialData()

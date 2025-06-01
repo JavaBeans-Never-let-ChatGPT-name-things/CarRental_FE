@@ -25,6 +25,7 @@ data class Contract (
     val paymentStatus: PaymentStatus,
     val pending: Boolean,
     val employeeName: String?,
+    val retryCountLeft: Int,
     val returnCarStatus: ReturnCarStatus?,
     val deposit: Float,
     val totalPrice: Float

@@ -1,7 +1,6 @@
 package com.example.carrental_fe.screen.user.userContractDetail
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -32,6 +31,7 @@ class ContractDetailViewModel(private val accountRepository: AccountRepository,
     private val route = savedStateHandle.toRoute<ContractDetail>()
     val pricePreday = route.carPrice
     val carId = route.carId
+    val paymentStatus = route.paymentStatus
     private val _contractId = MutableStateFlow<Long>(0)
     private val _checkoutUrl = MutableStateFlow<String>("")
     private val _account = MutableStateFlow<Account?>(null)

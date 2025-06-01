@@ -42,6 +42,10 @@ android {
 }
 
 dependencies {
+    // LiveData ↔ Compose state adapterAdd commentMore actions
+    implementation ("androidx.compose.runtime:runtime-livedata:1.8.2")
+
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.9.0")
     //Chart dependencies
     implementation ("com.github.PhilJay:MPAndroidChart:3.1.0")
     //HorizontalPager

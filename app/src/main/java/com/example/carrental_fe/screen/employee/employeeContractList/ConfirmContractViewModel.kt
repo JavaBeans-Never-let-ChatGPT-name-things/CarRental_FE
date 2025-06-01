@@ -17,13 +17,26 @@ class ConfirmContractViewModel(private val employeeRepository: EmployeeRepositor
     private val _contracts = MutableStateFlow<List<Contract>>(emptyList())
     val contracts : StateFlow<List<Contract>> = _contracts
 
+    private val _filterOptions = MutableStateFlow<List<String>>(emptyList())
+    val filterOptions: StateFlow<List<String>> = _filterOptions
+
+    private val _selectedFilter = MutableStateFlow("All User")
+    val selectedFilter : StateFlow<String> = _selectedFilter
+    private val _selectedSort = MutableStateFlow("StartDate ASC")
+    val selectedSort : StateFlow<String> = _selectedSort
+
+    private val _filteredContracts = MutableStateFlow<List<Contract>>(emptyList())
+    val filteredContracts : StateFlow<List<Contract>> = _filteredContracts
+
     init {
         fetchContracts()
+        viewModelScope.launch { updateFilteredContracts() }
     }
     fun fetchContracts() {
         viewModelScope.launch {
             try {
                 _contracts.value = employeeRepository.getPendingContracts()
+                _filterOptions.value = listOf("All User") + _contracts.value.map { it.customerName }.distinct()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -48,6 +61,31 @@ class ConfirmContractViewModel(private val employeeRepository: EmployeeRepositor
                 e.printStackTrace()
             }
         }
+    }
+    fun setFilter(filter: String) {
+        _selectedFilter.value = filter
+        updateFilteredContracts()
+    }
+
+    fun setSort(sort: String) {
+        _selectedSort.value = sort
+        updateFilteredContracts()
+    }
+    private fun updateFilteredContracts() {
+        val currentContracts = _contracts.value
+        val filtered = if (_selectedFilter.value == "All User") {
+            currentContracts
+        } else {
+            currentContracts.filter { it.customerName == _selectedFilter.value }
+        }
+
+        val sorted = when (_selectedSort.value) {
+            "StartDate ASC" -> filtered.sortedBy { it.startDate }
+            "StartDate DESC" -> filtered.sortedByDescending { it.startDate }
+            else -> filtered
+        }
+
+        _filteredContracts.value = sorted
     }
     companion object{
         val Factory: ViewModelProvider.Factory = viewModelFactory {

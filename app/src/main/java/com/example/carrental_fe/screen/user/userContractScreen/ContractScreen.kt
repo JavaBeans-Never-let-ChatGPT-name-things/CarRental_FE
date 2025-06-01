@@ -3,6 +3,7 @@ package com.example.carrental_fe.screen.user.userContractScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -62,7 +65,7 @@ fun ContractScreen(
     vm: ContractViewModel = viewModel(factory = ContractViewModel.Factory),
     onCheckoutNav: (String, String, Long?) -> Unit,
 ) {
-    val contracts = vm.contracts.collectAsState().value
+    val contracts = vm.filteredContracts.collectAsState().value
     val showDialog = vm.showReviewDialog.collectAsState()
     val stars = vm.reviewStars.collectAsState()
     val comment = vm.reviewComment.collectAsState()
@@ -70,14 +73,80 @@ fun ContractScreen(
     val showConfirmDialog = remember { mutableStateOf(false) }
     val lostContractId = remember { mutableStateOf<Long?>(null) }
     val selectedDaysMap = remember { mutableStateMapOf<Long, Int>() }
-
+    val filterOptions = vm.filterOptions.collectAsState().value
+    val selectedFilter = vm.selectedFilter.collectAsState()
+    val selectedSort = vm.selectedSort.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .background(Color.White)
             .padding(top = 16.dp)
     ) {
         TopTitle("Contracts")
+        Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                ) {
+                    var expandedFilter by remember { mutableStateOf(false) }
+                    Text("Filter By:", fontFamily = FontFamily(Font(R.font.montserrat_semibold)), fontSize = 16.sp)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Box{
+                        Text(
+                            text = selectedFilter.value,
+                            modifier = Modifier
+                                .clickable { expandedFilter = true }
+                                .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        )
+                        DropdownMenu(
+                            expanded = expandedFilter,
+                            onDismissRequest = { expandedFilter = false }
+                        ) {
+                            filterOptions.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option) },
+                                    onClick = {
+                                        vm.setFilter(option)
+                                        expandedFilter = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    var expandedSort by remember { mutableStateOf(false) }
+                    Text("Sort By:", fontFamily = FontFamily(Font(R.font.montserrat_semibold)), fontSize = 16.sp)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Box {
+                        Text(
+                            text = selectedSort.value,
+                            modifier = Modifier
+                                .clickable { expandedSort = true }
+                                .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        )
+                        DropdownMenu(
+                            expanded = expandedSort,
+                            onDismissRequest = { expandedSort = false }
+                        ) {
+                            listOf("StartDate ASC", "StartDate DESC").forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option) },
+                                    onClick = {
+                                        vm.setSort(option)
+                                        expandedSort = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+        Spacer(modifier = Modifier.height(10.dp))
         HorizontalPager(
             state = pagerState,
             contentPadding = PaddingValues(horizontal = 20.dp),
@@ -230,13 +299,16 @@ fun ContractCard(
                     }
 
                     contract.paymentStatus == PaymentStatus.FAILED -> {
-                        CustomButton(
-                            backgroundColor = blue,
-                            text = "Retry",
-                            textColor = 0xFFFFFFFF,
-                            onClickChange = onCheckoutNav,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        if (contract.retryCountLeft > 0 )
+                        {
+                            CustomButton(
+                                backgroundColor = blue,
+                                text = "Retry",
+                                textColor = 0xFFFFFFFF,
+                                onClickChange = onCheckoutNav,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
 
                     contract.contractStatus == ContractStatus.PICKED_UP -> {

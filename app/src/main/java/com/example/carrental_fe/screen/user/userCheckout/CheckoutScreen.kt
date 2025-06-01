@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -17,7 +16,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun PaymentWebViewScreen(vm: CheckoutViewModel = viewModel(factory = CheckoutViewModel.Factory),onBackStab: () -> Unit) {
+fun PaymentWebViewScreen(
+                         vm: CheckoutViewModel = viewModel(factory = CheckoutViewModel.Factory),
+                         onBackStab: (String?, Float?, Boolean?, String) -> Unit) {
     val context = LocalContext.current
     val url = vm.checkoutUrl.collectAsState()
     AndroidView(
@@ -31,14 +32,13 @@ fun PaymentWebViewScreen(vm: CheckoutViewModel = viewModel(factory = CheckoutVie
                     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                         when {
                             url?.contains("success") == true -> {
-                                onBackStab()
+
                                 vm.paymentSuccess()
-                                Toast.makeText(context, "Payment Success!", Toast.LENGTH_SHORT).show()
+                                onBackStab(vm.carId, 0f, vm.isRetry, "success")
                             }
                             url?.contains("cancel") == true -> {
-                                onBackStab()
                                 vm.paymentFailed()
-                                Toast.makeText(context, "Payment Canceled", Toast.LENGTH_SHORT).show()
+                                onBackStab(vm.carId, 0f, vm.isRetry, "cancel")
                             }
                         }
                     }
