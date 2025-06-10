@@ -35,6 +35,9 @@ class ContractViewModel (private val accountRepository: AccountRepository,
     private val _filteredContracts = MutableStateFlow<List<Contract>>(emptyList())
     val filteredContracts : StateFlow<List<Contract>> = _filteredContracts
 
+    private val _showRetryDialog = MutableStateFlow(false)
+    val showRetryDialog: StateFlow<Boolean> = _showRetryDialog
+
     private val _selectedContractId = MutableStateFlow<Long?>(null)
 
     val reviewComment = MutableStateFlow("")
@@ -81,10 +84,17 @@ class ContractViewModel (private val accountRepository: AccountRepository,
     fun dismissReviewDialog() {
         _showReviewDialog.value = false
     }
+    fun dismissRetryDialog() {
+        _showRetryDialog.value = false
+    }
     fun retryContract(contractId: Long, carId: String, onCheckoutNav: (String, String, Long?) -> Unit) {
         viewModelScope.launch {
             try {
-                accountRepository.retryContract(contractId)
+                val result = accountRepository.retryContract(contractId)
+                        if (result.message != "Successfully holded for contract id: $contractId"){
+                            _showRetryDialog.value = true
+                            return@launch
+                        }
                 val checkoutUrl = payOsRepository.getCheckoutUrl(ItemRequest(
                     name = "Retry payment for contract with car name: $carId",
                     quantity = 1,
