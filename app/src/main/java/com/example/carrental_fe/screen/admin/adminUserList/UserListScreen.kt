@@ -336,7 +336,7 @@ fun UserCard(
 }
 
 @Composable
-fun InfoRow(icon: ImageVector, label: String, value: String) {
+fun InfoRow(icon: ImageVector, label: String, value: String, isGoodCredit: Boolean? = null) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(icon, contentDescription = null, modifier = Modifier.size(15.dp))
         Spacer(Modifier.width(10.dp))
@@ -344,12 +344,14 @@ fun InfoRow(icon: ImageVector, label: String, value: String) {
             Text(
                 text = label,
                 fontFamily = FontFamily(Font(R.font.montserrat_bold)),
+                color = if (isGoodCredit == true) Color(0xFF0D6EFD) else if (isGoodCredit == false) Color(0xFFF40707) else Color.Black,
                 fontSize = 14.sp
             )
             Spacer(modifier = Modifier.height(3.dp))
             Text(
                 text = value,
                 fontFamily = FontFamily(Font(R.font.montserrat_medium)),
+                color = if (isGoodCredit == true) Color(0xFF0D6EFD) else if (isGoodCredit == false) Color(0xFFF40707) else Color.Black,
                 fontSize = 12.sp
             )
         }
