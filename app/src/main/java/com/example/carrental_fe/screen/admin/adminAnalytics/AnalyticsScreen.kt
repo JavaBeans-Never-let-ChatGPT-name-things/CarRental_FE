@@ -1,5 +1,7 @@
 package com.example.carrental_fe.screen.admin.adminAnalytics
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,16 +21,23 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -41,10 +51,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -55,6 +71,8 @@ import com.example.carrental_fe.dto.response.ContractSummaryDTO
 import com.example.carrental_fe.dto.response.MonthlyReportDTO
 import com.example.carrental_fe.dto.response.UserSummaryDTO
 import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
+import com.example.carrental_fe.model.enums.ContractStatus
+import com.example.carrental_fe.screen.admin.adminUserList.InfoRow
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
@@ -139,7 +157,7 @@ fun AnalyticsScreen(viewModel: AnalyticsViewModel = viewModel(factory = Analytic
             data = viewModel.returnStatus.collectAsState().value.map { it.returnCarStatus.name to it.value.toFloat() }
         )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(20.dp))
 
         // Top 3 Cars Filter
         DropdownMenuSelector(
@@ -179,7 +197,11 @@ fun DropdownMenuSelector(
 ) {
 
     Column {
-        Text(label, fontWeight = FontWeight.Medium)
+        Text(text = label,
+                fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
+            fontSize = 18.sp
+        )
+        Spacer(Modifier.height(4.dp))
         Box {
             OutlinedTextField(
                 value = selectedOption,
@@ -306,7 +328,7 @@ fun DateRangePicker(
         Spacer(Modifier.height(4.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             TextButton(onClick = onReset) {
-                Text("Reset Date Range")
+                Text("Reset Date Range", color = Color(0xFF0D6EFD))
             }
         }
     }
@@ -365,11 +387,20 @@ fun LabeledDatePicker(
 
 @Composable
 fun SummaryCard(title: String, value: Double) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(title, fontWeight = FontWeight.Bold)
-            Text("$value", style = MaterialTheme.typography.headlineSmall)
-        }
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween)
+    {
+        Text(
+            text = title,
+            fontFamily = FontFamily(Font(R.font.montserrat_bold)),
+            color = if (title == "Total Revenue") Color(0xFF0D6EFD) else Color(0xFFF40707),
+            fontSize = 18.sp,
+            )
+        Text(
+            text = "$value $",
+            fontFamily = FontFamily(Font(R.font.montserrat_bold)),
+            color = Color.Black,
+            fontSize = 16.sp,
+            )
     }
 }
 
@@ -377,10 +408,19 @@ fun SummaryCard(title: String, value: Double) {
 fun ContractSummarySection(contractSummary: List<ContractSummaryDTO>) {
     LazyRow {
         items(contractSummary) { item ->
-            Card(modifier = Modifier.padding(8.dp)) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(item.contractStatus.name, fontWeight = FontWeight.Bold)
-                    Text("${item.value}")
+            Card(modifier = Modifier.padding(8.dp),
+                    elevation = CardDefaults.cardElevation(8.dp),
+                colors = CardDefaults.cardColors(Color(0xFFF7F7F9))) {
+                Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Image(
+                        painter = painterResource(if (item.contractStatus == ContractStatus.PICKED_UP ||
+                            item.contractStatus == ContractStatus.REVIEWED ||
+                            item.contractStatus == ContractStatus.COMPLETE ||
+                            item.contractStatus == ContractStatus.BOOKED) R.drawable.good else R.drawable.bad),
+                        contentDescription = null,
+                    )
+                    Text(item.contractStatus.name, fontFamily = FontFamily(Font(R.font.montserrat_medium)), fontWeight = FontWeight.Bold)
+                    Text("${item.value}", fontFamily = FontFamily(Font(R.font.montserrat_regular)),)
                 }
             }
         }
@@ -392,7 +432,10 @@ fun ContractSummarySection(contractSummary: List<ContractSummaryDTO>) {
 @Composable
 fun PieChartSection(title: String, data: List<Pair<String, Float>>) {
     Column {
-        Text(title, fontWeight = FontWeight.Bold)
+        Text(text = title,
+            fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
+            fontSize = 18.sp
+        )
         Spacer(Modifier.height(8.dp))
         AndroidView(
             factory = { ctx ->
@@ -428,14 +471,85 @@ fun PieChartSection(title: String, data: List<Pair<String, Float>>) {
 fun Top3CarSection(selectedOption: String, cars: List<CarSummaryDTO>) {
     Column {
         cars.forEach {
-            Card(modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp)) {
-                    AsyncImage(model = it.imageUrl, contentDescription = null, modifier = Modifier.size(64.dp))
-                    Spacer(Modifier.width(16.dp))
-                    Column {
-                        if (selectedOption == "Rental Count") Text("Rental: ${it.rentalCount}") else Text("Rating: ${it.rating}")
+            CarCard(car = it, selectedOption = selectedOption)
+        }
+    }
+}
+@Composable
+fun CarCard(car: CarSummaryDTO, selectedOption: String) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .background(Color.White)
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            AsyncImage(
+                model = car.imageUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .weight(1.5f)
+                    .aspectRatio(1.6f)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = car.id.uppercase(),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 22.sp
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (selectedOption != "Rental Count")
+                    {
+                        Text(
+                            text = "RATING:",
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = car.rating.toString(),
+                            fontFamily = FontFamily(Font(R.font.montserrat_medium)),
+                            fontSize = 14.sp
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = Color(0xFFFFC107),
+                            modifier = Modifier
+                                .size(18.dp)
+                                .padding(start = 4.dp)
+                        )
+                    }
+                    else{
+                        Text(
+                            text = "RENTAL COUNT:",
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily(Font(R.font.montserrat_semibold))
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = car.rentalCount.toString(),
+                            fontFamily = FontFamily(Font(R.font.montserrat_medium)),
+                            fontSize = 12.sp
+                        )
                     }
                 }
             }
@@ -445,29 +559,68 @@ fun Top3CarSection(selectedOption: String, cars: List<CarSummaryDTO>) {
 
 @Composable
 fun Top3UserSection(title: String, users: List<UserSummaryDTO>) {
-    Text(title, fontWeight = FontWeight.Bold)
-    Column {
+    Text(text = title,
+        fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
+        fontSize = 18.sp
+    )
+    Column (
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
         users.forEach {
-            Card(modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp)) {
-                    AsyncImage(model = it.avatarUrl,
-                        placeholder = painterResource(id = if (it.gender == 1) R.drawable.male else R.drawable.female),
-                        error = painterResource(id = if (it.gender == 1) R.drawable.male else R.drawable.female),
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp))
+            Card(
+                    modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(5.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F7F9))
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        AsyncImage(
+                            model = it.avatarUrl,
+                            contentDescription = "Profile Image",
+                            placeholder = painterResource(id = if (it.gender == 1) R.drawable.male else R.drawable.female),
+                            error = painterResource(id = if (it.gender == 1) R.drawable.male else R.drawable.female),
+                            modifier = Modifier
+                                .size(110.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                     Spacer(Modifier.width(16.dp))
-                    Column {
-                        Text(it.displayName)
-                        Text(it.email)
-                        Text(
-                            "Credit: ${it.creditPoint}",
-                            color = if (it.creditPoint >= 0) Color(0xFF0D6EFD) else Color(0xFFF40707)
+                    Column(modifier = Modifier.weight(1f)) {
+                        InfoRow(
+                            icon = Icons.Default.Person,
+                            label = "Display Name:",
+                            value = it.displayName
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        InfoRow(
+                            icon = Icons.Default.Phone,
+                            label = "Phone Number:",
+                            value = it.phoneNumber ?: ""
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        InfoRow(icon = Icons.Default.Email, label = "Email:", value = it.email)
+                        Spacer(Modifier.height(8.dp))
+                        InfoRow(
+                            icon = Icons.Default.Receipt,
+                            label = "Credit Point",
+                            value = "${it.creditPoint}",
+                            isGoodCredit = (if (it.creditPoint>0) true else false)
                         )
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+@Preview(backgroundColor = 0xFFFFFFFF, showBackground = true)
+fun AnalyticsScreenPreview() {
+    AnalyticsScreen()
 }

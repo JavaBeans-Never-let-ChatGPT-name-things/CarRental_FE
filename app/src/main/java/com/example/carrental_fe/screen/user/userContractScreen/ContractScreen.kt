@@ -49,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.carrental_fe.R
 import com.example.carrental_fe.dialog.ConfirmReportLostDialog
+import com.example.carrental_fe.dialog.ErrorDialog
 import com.example.carrental_fe.dialog.ReviewDialog
 import com.example.carrental_fe.model.Contract
 import com.example.carrental_fe.model.enums.ContractStatus
@@ -76,6 +77,7 @@ fun ContractScreen(
     val filterOptions = vm.filterOptions.collectAsState().value
     val selectedFilter = vm.selectedFilter.collectAsState()
     val selectedSort = vm.selectedSort.collectAsState()
+    val showRetryDialog = vm.showRetryDialog.collectAsState().value
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -197,6 +199,12 @@ fun ContractScreen(
             onDismiss = {
                 showConfirmDialog.value = false
             }
+        )
+    }
+    if (showRetryDialog) {
+        ErrorDialog (
+            text = "This car has already been rented. Please try again later.",
+            onDismiss = {   vm.dismissRetryDialog() }
         )
     }
 }
