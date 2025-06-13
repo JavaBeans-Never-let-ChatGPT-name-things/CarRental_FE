@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
+import com.example.carrental_fe.dialog.SuccessDialog
 import com.example.carrental_fe.model.Contract
 import com.example.carrental_fe.screen.user.userContractScreen.ContractCard
 import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
@@ -59,6 +60,8 @@ fun PendingContractScreen(vm: PendingContractViewModel = viewModel(factory = Pen
     val filterOptions = vm.filterOptions.collectAsState().value
     val selectedFilter = vm.selectedFilter.collectAsState()
     val selectedSort = vm.selectedSort.collectAsState()
+    val message = vm.message.collectAsState().value
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -206,6 +209,11 @@ fun PendingContractScreen(vm: PendingContractViewModel = viewModel(factory = Pen
                     }
                 }
             )
+        }
+        message?.let{
+            SuccessDialog(text = message) {
+                vm.clearMessage()
+            }
         }
     }
 }

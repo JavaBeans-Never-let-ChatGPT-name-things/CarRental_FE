@@ -39,6 +39,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.carrental_fe.R
+import com.example.carrental_fe.dialog.ErrorDialog
 import com.example.carrental_fe.dialog.LoadingDialog
 import com.example.carrental_fe.screen.component.BackButton
 import com.example.carrental_fe.screen.component.CustomButton
@@ -60,6 +61,10 @@ fun EditProfileScreen(
     val avatarUrl by viewModel.avatarUrl.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val context = LocalContext.current
+
+    val isInvalid = viewModel.invalid.collectAsState()
+    val errorMessage = viewModel.errorMessage.collectAsState()
+
     // Chọn ảnh
     val imageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -240,6 +245,12 @@ fun EditProfileScreen(
                 viewModel.saveProfile(onBackNav)
             }
         )
+    }
+    if (isInvalid.value)
+    {
+        ErrorDialog(text = errorMessage.value) {
+            viewModel.resetInvalid()
+        }
     }
 }
 

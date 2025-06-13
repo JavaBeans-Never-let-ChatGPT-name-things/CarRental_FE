@@ -38,6 +38,12 @@ class EditProfileViewModel(private val accountRepository: AccountRepository): Vi
     private val  _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
+    private val _invalid = MutableStateFlow(false)
+    val invalid = _invalid.asStateFlow()
+
+    private val _errorMessage = MutableStateFlow("")
+    val errorMessage = _errorMessage.asStateFlow()
+
     fun setInitialData() {
         viewModelScope.launch {
             val account = accountRepository.getAccount().body()
@@ -74,7 +80,28 @@ class EditProfileViewModel(private val accountRepository: AccountRepository): Vi
         _avatarFile.value = file
     }
 
+    fun String.isNumeric(): Boolean {
+        val regex = "^\\d+$".toRegex()
+        return this.matches(regex)
+    }
+    fun resetInvalid(){
+        _invalid.value = false
+        _errorMessage.value = ""
+    }
     fun saveProfile(onBackNav:()-> Unit) {
+        if (_displayName.value.isEmpty() ||
+            _address.value.isEmpty() ||
+            _phoneNumber.value.isEmpty()) {
+            _invalid.value = true
+            _errorMessage.value = "Please fill in all required fields."
+            return
+        }
+        if (_phoneNumber.value.length != 10 || !_phoneNumber.value.isNumeric())
+        {
+            _invalid.value = true
+            _errorMessage.value = "Phone number must be 10 digits long and numeric."
+            return
+        }
         viewModelScope.launch {
             try {
                 _isLoading.value = true

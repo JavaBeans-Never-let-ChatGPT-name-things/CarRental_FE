@@ -9,8 +9,10 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.carrental_fe.CarRentalApplication
 import com.example.carrental_fe.data.EmployeeRepository
 import com.example.carrental_fe.model.Contract
+import com.github.mikephil.charting.utils.Utils.init
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ConfirmContractViewModel(private val employeeRepository: EmployeeRepository): ViewModel() {
@@ -28,18 +30,23 @@ class ConfirmContractViewModel(private val employeeRepository: EmployeeRepositor
     private val _filteredContracts = MutableStateFlow<List<Contract>>(emptyList())
     val filteredContracts : StateFlow<List<Contract>> = _filteredContracts
 
-    init {
-        fetchContracts()
-        viewModelScope.launch { updateFilteredContracts() }
+    private val _message = MutableStateFlow<String?>(null)
+    val message: StateFlow<String?> = _message.asStateFlow()
+    fun clearMessage() {
+        _message.value = null
     }
-    fun fetchContracts() {
+    init {
         viewModelScope.launch {
-            try {
-                _contracts.value = employeeRepository.getPendingContracts()
-                _filterOptions.value = listOf("All User") + _contracts.value.map { it.customerName }.distinct()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            fetchContracts()
+            updateFilteredContracts()
+        }
+    }
+    suspend fun fetchContracts() {
+        try {
+            _contracts.value = employeeRepository.getPendingContracts()
+            _filterOptions.value = listOf("All User") + _contracts.value.map { it.customerName }.distinct()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
     fun confirmContract(contractId: Long) {
@@ -47,6 +54,8 @@ class ConfirmContractViewModel(private val employeeRepository: EmployeeRepositor
             try {
                 employeeRepository.confirmAssignment(contractId)
                 fetchContracts()
+                updateFilteredContracts()
+                _message.value = "Contract confirmed successfully."
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -57,6 +66,8 @@ class ConfirmContractViewModel(private val employeeRepository: EmployeeRepositor
             try {
                 employeeRepository.rejectAssignment(contractId)
                 fetchContracts()
+                updateFilteredContracts()
+                _message.value = "Contract rejected successfully."
             } catch (e: Exception) {
                 e.printStackTrace()
             }

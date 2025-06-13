@@ -10,6 +10,7 @@ import com.example.carrental_fe.CarRentalApplication
 import com.example.carrental_fe.data.AuthenticationRepository
 import com.example.carrental_fe.dto.request.EmailRequest
 import com.example.carrental_fe.dto.response.MessageResponse
+import com.example.carrental_fe.utils.isValidEmail
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -38,6 +39,11 @@ class ForgotPasswordViewModel (private val authenticationRepository: Authenticat
     }
     fun sendEmail()
     {
+        if (!_email.value.isValidEmail())
+        {
+            _forgotPasswordState.value = ForgotPasswordState.Error("Invalid email format")
+            return
+        }
         viewModelScope.launch {
             _forgotPasswordState.value = ForgotPasswordState.Loading
             try {

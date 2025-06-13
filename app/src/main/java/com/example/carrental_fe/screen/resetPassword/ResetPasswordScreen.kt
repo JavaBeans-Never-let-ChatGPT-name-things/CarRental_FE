@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.*
+import com.example.carrental_fe.dialog.ErrorDialog
+import com.example.carrental_fe.dialog.LoadingDialog
 import com.example.carrental_fe.nav.Login
 import com.example.carrental_fe.screen.component.*
 @Composable
@@ -44,6 +46,7 @@ fun ResetPasswordScreen(
     val password by resetPasswordViewModel.password.collectAsState()
     val isPasswordVisible by resetPasswordViewModel.isPasswordVisible.collectAsState()
     val resetPasswordState by resetPasswordViewModel.resetPasswordState.collectAsState()
+    val errorMessage by resetPasswordViewModel.errorMessage.collectAsState()
 
     Box(
         modifier = Modifier
@@ -126,6 +129,15 @@ fun ResetPasswordScreen(
             }
             else -> showLoadingDialog = false
         }
+    }
+    if (showLoadingDialog){
+        LoadingDialog()
+    }
+    if (showErrorDialog) {
+        ErrorDialog(
+            onDismiss = { showErrorDialog = false },
+            text = errorMessage ?: "An error occurred. Try again later"
+        )
     }
 }
 

@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.carrental_fe.CarRentalApplication
 import com.example.carrental_fe.data.AdminRepository
 import com.example.carrental_fe.model.Contract
+import com.github.mikephil.charting.utils.Utils.init
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,10 +18,6 @@ import kotlinx.coroutines.launch
 class PendingContractViewModel(private val adminRepository: AdminRepository): ViewModel() {
     private val _pendingContracts = MutableStateFlow<List<Contract>>(emptyList())
     val pendingContracts: StateFlow<List<Contract>> = _pendingContracts
-
-    private val _employees = MutableStateFlow<List<String>>(emptyList())
-    val employees: StateFlow<List<String>> = _employees
-
     private val _filterOptions = MutableStateFlow<List<String>>(emptyList())
     val filterOptions: StateFlow<List<String>> = _filterOptions
 
@@ -32,9 +29,20 @@ class PendingContractViewModel(private val adminRepository: AdminRepository): Vi
 
     private val _filteredContracts = MutableStateFlow<List<Contract>>(emptyList())
     val filteredContracts : StateFlow<List<Contract>> = _filteredContracts
+    private val _employees = MutableStateFlow<List<String>>(emptyList())
+    val employees: StateFlow<List<String>> = _employees
+
+    private val _message = MutableStateFlow<String?>(null)
+    val message: StateFlow<String?> = _message
+
     init {
         fetchContracts()
-        viewModelScope.launch { updateFilteredContracts() }
+        viewModelScope.launch {
+            pendingContracts.collect { updateFilteredContracts() }
+        }
+    }
+    fun clearMessage(){
+        _message.value = null
     }
     fun fetchContracts()
     {
@@ -61,7 +69,21 @@ class PendingContractViewModel(private val adminRepository: AdminRepository): Vi
             }
         }
     }
-
+    fun assignContract(contractId: Long, employeeName: String)
+    {
+        viewModelScope.launch {
+            try{
+                adminRepository.assignContract(contractId, employeeName)
+                fetchContracts()
+                pendingContracts.collect { updateFilteredContracts() }
+                _message.value = "Contract assigned successfully to $employeeName"
+            }
+            catch(e: Exception)
+            {
+                Log.d("Assign Contract", e.message.toString())
+            }
+        }
+    }
     fun setFilter(filter: String) {
         _selectedFilter.value = filter
         updateFilteredContracts()
@@ -86,18 +108,6 @@ class PendingContractViewModel(private val adminRepository: AdminRepository): Vi
         }
 
         _filteredContracts.value = sorted
-    }
-    fun assignContract(contractId: Long, employeeName: String)
-    {
-        viewModelScope.launch {
-            try{
-                adminRepository.assignContract(contractId, employeeName)
-            }
-            catch(e: Exception)
-            {
-                Log.d("Assign Contract", e.message.toString())
-            }
-        }
     }
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory{

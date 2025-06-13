@@ -104,7 +104,7 @@ fun LoginScreen (
                 isPasswordVisible = isPasswordVisible)
 
             Text(
-                text = "Recovery Password",
+                text = "Recover Password",
                 fontFamily = FontFamily(Font(R.font.montserrat_medium)),
                 fontSize = 14.sp,
                 color = Color.Gray,
@@ -123,12 +123,12 @@ fun LoginScreen (
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            CustomButton(
-                backgroundColor = Color(0xFFF5F5F5),
-                text = "Sign In With Google",
-                imageResId = R.drawable.google,
-                textColor = 0xFF2B2B2B
-            )
+//            CustomButton(
+//                backgroundColor = Color(0xFFF5F5F5),
+//                text = "Sign In With Google",
+//                imageResId = R.drawable.google,
+//                textColor = 0xFF2B2B2B
+//            )
 
             Spacer(modifier = Modifier.height(125.dp))
 
@@ -163,6 +163,6 @@ fun LoginScreen (
     }
 
     if (showErrorDialog) {
-        ErrorDialog { showErrorDialog = false }
+        ErrorDialog (text = "Wrong Username or Password. Please try again") { showErrorDialog = false }
     }
 }

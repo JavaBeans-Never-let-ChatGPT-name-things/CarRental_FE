@@ -1,5 +1,23 @@
 package com.example.carrental_fe.screen.admin.adminAnalytics
 
+import android.R.attr.bitmap
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Rect
+import android.graphics.pdf.PdfDocument
+import android.os.Environment
+import android.os.Handler
+import android.os.Looper
+import android.print.PrintAttributes
+import android.print.PrintManager
+import android.view.PixelCopy
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +48,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.DatePicker
@@ -37,8 +56,10 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -52,8 +73,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.Font
@@ -63,6 +88,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.carrental_fe.R
@@ -83,12 +109,285 @@ import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
+import java.io.File
+import java.io.FileOutputStream
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.math.min
 import android.graphics.Color as AndroidColor
+import androidx.core.graphics.createBitmap
 
+//@SuppressLint("ContextCastToActivity")
+//@Composable
+//fun AnalyticsScreenWithExportPdf(
+//    viewModel: AnalyticsViewModel = viewModel(factory = AnalyticsViewModel.Factory)
+//) {
+//    val context = LocalContext.current
+//    val activity = LocalContext.current as? Activity
+//    val view = LocalView.current
+//
+//    Box(modifier = Modifier.fillMaxSize()) {
+//        // 1. Scrollable content, không fillMaxSize 100% để còn chừa chỗ cho button
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(bottom = 80.dp) // chừa 80dp cho button
+//        ) {
+//            AnalyticsScreen(viewModel = viewModel)
+//        }
+//        ExtendedFloatingActionButton(
+//            onClick = {
+//                if (activity == null) {
+//                    Toast.makeText(context, "Không lấy được Activity", Toast.LENGTH_SHORT).show()
+//                    return@ExtendedFloatingActionButton
+//                }
+//
+//                // 1. Tạo software bitmap
+//                val width = view.width
+//                val height = view.height
+//                if (width == 0 || height == 0) {
+//                    Toast.makeText(context, "View chưa layout xong", Toast.LENGTH_SHORT).show()
+//                    return@ExtendedFloatingActionButton
+//                }
+//                val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+//
+//                // 2. Dùng PixelCopy để copy từ window
+//                val location = IntArray(2).also { view.getLocationInWindow(it) }
+//                val srcRect = Rect(
+//                    location[0], location[1],
+//                    location[0] + width, location[1] + height
+//                )
+//                PixelCopy.request(
+//                    activity.window,
+//                    srcRect,
+//                    bitmap,
+//                    { copyResult ->
+//                        if (copyResult == PixelCopy.SUCCESS) {
+//                            // 3. Ghi bitmap vào PDF
+//                            val document = PdfDocument()
+//                            val pageInfo = PdfDocument.PageInfo
+//                                .Builder(width, height, 1)
+//                                .create()
+//                            val page = document.startPage(pageInfo)
+//                            page.canvas.drawBitmap(bitmap, 0f, 0f, null)
+//                            document.finishPage(page)
+//
+//                            val docsDir = context
+//                                .getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+//                            docsDir?.mkdirs()
+//                            val file = File(docsDir, "analytics_report.pdf")
+//                            document.writeTo(FileOutputStream(file))
+//                            document.close()
+//
+//                            Toast
+//                                .makeText(context, "PDF saved: ${file.absolutePath}", Toast.LENGTH_LONG)
+//                                .show()
+//                        } else {
+//                            Toast
+//                                .makeText(context, "PixelCopy thất bại: $copyResult", Toast.LENGTH_LONG)
+//                                .show()
+//                        }
+//                    },
+//                    Handler(Looper.getMainLooper())
+//                )
+//            },
+//            icon = { Icon(Icons.Filled.PictureAsPdf, contentDescription = null) },
+//            text = { Text("Export PDF") },
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp)
+//                .align(Alignment.BottomCenter)
+//        )
+//    }
+//}
+
+@SuppressLint("ContextCastToActivity")
+@Composable
+fun AnalyticsScreenWithExportPdf(
+    viewModel: AnalyticsViewModel = viewModel(factory = AnalyticsViewModel.Factory)
+) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+    Scaffold(
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = {
+                    if (activity != null) exportAnalyticsToPdf(activity, viewModel)
+                },
+                icon = { Icon(Icons.Filled.PictureAsPdf, contentDescription = null) },
+                text = { Text("Export PDF") }
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            AnalyticsScreen(viewModel)
+        }
+    }
+}
+
+
+fun exportAnalyticsToPdf(activity: Activity, viewModel: AnalyticsViewModel) {
+    val context = activity
+    val decor = activity.window.decorView as ViewGroup
+
+    // Tạo ComposeView off-screen hiển thị AnalyticsPrintableScreen
+    val composeView = ComposeView(context).apply {
+        alpha = 0f
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+        setContent { AnalyticsPrintableScreen(viewModel) }
+    }
+    decor.addView(
+        composeView,
+        FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    )
+
+    composeView.doOnLayout {
+        val width = composeView.width
+        val height = composeView.height
+
+        if (width == 0 || height == 0) {
+            Toast.makeText(context, "Layout chưa sẵn sàng", Toast.LENGTH_SHORT).show()
+            decor.removeView(composeView)
+            return@doOnLayout
+        }
+
+        val bitmap = createBitmap(width, height)
+        val loc = IntArray(2).also(composeView::getLocationInWindow)
+        val rect = Rect(loc[0], loc[1], loc[0] + width, loc[1] + height)
+
+        PixelCopy.request(
+            activity.window,
+            rect,
+            bitmap,
+            { result ->
+                if (result == PixelCopy.SUCCESS) {
+                    val pdf = PdfDocument()
+                    val sliceHeight = context.resources.displayMetrics.heightPixels
+                    var offsetY = 0
+                    var page = 1
+
+                    while (offsetY < bitmap.height) {
+                        val h = minOf(sliceHeight, bitmap.height - offsetY)
+                        val pageInfo = PdfDocument.PageInfo.Builder(width, h, page++).create()
+                        val p = pdf.startPage(pageInfo)
+                        val src = Rect(0, offsetY, width, offsetY + h)
+                        val dst = Rect(0, 0, width, h)
+                        p.canvas.drawBitmap(bitmap, src, dst, null)
+                        pdf.finishPage(p)
+                        offsetY += h
+                    }
+
+                    val file = File(
+                        context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
+                        "analytics_report.pdf"
+                    )
+                    pdf.writeTo(FileOutputStream(file))
+                    pdf.close()
+                    Toast.makeText(context, "PDF đã lưu tại:\n${file.absolutePath}", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(context, "PixelCopy thất bại: $result", Toast.LENGTH_LONG).show()
+                }
+                decor.removeView(composeView)
+            },
+            Handler(Looper.getMainLooper())
+        )
+    }
+}
+
+
+
+@Composable
+fun AnalyticsPrintableScreen(viewModel: AnalyticsViewModel) {
+    val selectedFilter = viewModel.carFilterOption.collectAsState().value
+    val contractSummary = viewModel.contractSummary.collectAsState().value
+    val returnStatus = viewModel.returnStatus.collectAsState().value
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        TopTitle("Analytics")
+        Spacer(Modifier.height(16.dp))
+        DualBarChart(
+            revenueData = viewModel.monthlyRevenue.collectAsState().value,
+            penaltyData = viewModel.monthlyPenalty.collectAsState().value,
+            revenueColor = Color(0xFF0D6EFD),
+            penaltyColor = Color(0xFFF40707)
+        )
+
+        Spacer(Modifier.height(16.dp))
+        SummaryCard("Total Revenue", viewModel.totalRevenue.collectAsState().value)
+        SummaryCard("Total Penalty", viewModel.totalPenalty.collectAsState().value)
+
+        Spacer(Modifier.height(16.dp))
+        Text("Contract Summary", fontSize = 18.sp)
+        AndroidView(
+            factory = {
+                generatePieChartView(
+                    it,
+                    contractSummary.map { it.contractStatus.name to it.value.toFloat() }
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        )
+
+        Spacer(Modifier.height(16.dp))
+        Text("Return Car Status", fontSize = 18.sp)
+        AndroidView(
+            factory = {
+                generatePieChartView(
+                    it,
+                    returnStatus.map { it.returnCarStatus.name to it.value.toFloat() }
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        )
+
+        Spacer(Modifier.height(16.dp))
+        Top3CarSection(selectedFilter, viewModel.top3Cars.collectAsState().value)
+        Top3UserSection("Top 3 Best Users", viewModel.top3BestUsers.collectAsState().value)
+        Top3UserSection("Top 3 Worst Users", viewModel.top3WorstUsers.collectAsState().value)
+    }
+}
+
+fun generatePieChartView(context: Context, data: List<Pair<String, Float>>): PieChart {
+    return PieChart(context).apply {
+        layoutParams = ViewGroup.LayoutParams(600, 600)
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+        description.isEnabled = false
+        isDrawHoleEnabled = true
+        legend.isEnabled = true
+
+        val entries = data.map { PieEntry(it.second, it.first) }
+        val dataSet = PieDataSet(entries, "").apply {
+            colors = ColorTemplate.MATERIAL_COLORS.toList()
+            valueTextSize = 14f
+        }
+
+        this.data = PieData(dataSet)
+        measure(
+            View.MeasureSpec.makeMeasureSpec(600, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(600, View.MeasureSpec.EXACTLY)
+        )
+        layout(0, 0, 600, 600)
+    }
+}
 @Composable
 fun AnalyticsScreen(viewModel: AnalyticsViewModel = viewModel(factory = AnalyticsViewModel.Factory)) {
     val scrollState = rememberScrollState()
@@ -420,7 +719,7 @@ fun ContractSummarySection(contractSummary: List<ContractSummaryDTO>) {
                         contentDescription = null,
                     )
                     Text(item.contractStatus.name, fontFamily = FontFamily(Font(R.font.montserrat_medium)), fontWeight = FontWeight.Bold)
-                    Text("${item.value}", fontFamily = FontFamily(Font(R.font.montserrat_regular)),)
+                    Text("${item.value}", fontFamily = FontFamily(Font(R.font.montserrat_regular)))
                 }
             }
         }

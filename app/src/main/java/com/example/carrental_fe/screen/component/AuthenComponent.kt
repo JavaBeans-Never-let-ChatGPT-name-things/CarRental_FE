@@ -54,7 +54,7 @@ fun InputField(value: String, placeHolder:String, onValueChange:(String) -> Unit
             .fillMaxWidth()
             .background(Color(0xFFF7F7F9), shape = RoundedCornerShape(12.dp))
             .padding(horizontal = 8.dp, vertical = 4.dp),
-        placeholder = { Text(placeHolder, color = Color.LightGray) },
+        placeholder = { Text(placeHolder, color = Color.Gray) },
         singleLine = true,
         keyboardOptions = keyboardOptions,
         readOnly = !editable,

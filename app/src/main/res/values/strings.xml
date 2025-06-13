@@ -5,7 +5,7 @@
     <string name="contract_screen_label">Contracts</string>
     <string name="notification_screen_label">Noti</string>
     <string name="profile_screen_label">Profile</string>
-    <string name="userManagement_screen_label">User Management</string>
+    <string name="userManagement_screen_label">Users</string>
     <string name="default_notification_channel_id">Global</string>
     <string name="car_label">Cars</string>
     <string name = "pending_contracts">Pending</string>

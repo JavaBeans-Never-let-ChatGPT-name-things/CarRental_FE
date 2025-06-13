@@ -154,7 +154,7 @@ fun RegisterScreen(
     }
 
     if (showErrorDialog) {
-        ErrorDialog { showErrorDialog = false }
+        ErrorDialog (text = (signUpState as SignUpState.Error).message) { showErrorDialog = false }
     }
 }
 

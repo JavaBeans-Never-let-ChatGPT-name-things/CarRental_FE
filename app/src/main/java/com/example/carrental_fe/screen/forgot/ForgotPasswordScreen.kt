@@ -1,5 +1,6 @@
 package com.example.carrental_fe.screen.forgot
 
+import android.R.attr.text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -112,7 +113,7 @@ fun ForgotPasswordScreen(
     }
 
     if (showErrorDialog) {
-        ErrorDialog { showErrorDialog = false }
+        ErrorDialog (text = (forgotPasswordState as ForgotPasswordState.Error).message) { showErrorDialog = false }
     }
 }
 @Preview

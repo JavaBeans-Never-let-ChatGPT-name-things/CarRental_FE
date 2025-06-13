@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.carrental_fe.R
+import com.example.carrental_fe.dialog.ErrorDialog
 import com.example.carrental_fe.model.Review
 import com.example.carrental_fe.model.enums.CarState
 import com.example.carrental_fe.screen.component.CustomButton
@@ -64,6 +66,8 @@ fun CarDetailScreen(
 ) {
     val car = viewModel.car.collectAsState()
     val reviews = viewModel.reviewList.collectAsState()
+    val isLoadingReview = viewModel.isLoadingReview.collectAsState()
+    val isQualified = viewModel.isQualified.collectAsState()
 
     Column(
         modifier = Modifier
@@ -80,7 +84,7 @@ fun CarDetailScreen(
             ) {
                 item {
                     Box(modifier = Modifier.fillMaxWidth()) {
-                        TopTitle(title = "${car.value?.id}")
+                        TopTitle(title = car.value?.id?:"")
                     }
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -104,7 +108,7 @@ fun CarDetailScreen(
                         RatingStars(car.value?.rating ?: 0f)
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            "${car.value?.rentalPrice}$/day",
+                            "${car.value?.rentalPrice?:""}$/day",
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
@@ -123,15 +127,15 @@ fun CarDetailScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             InfoCard(
-                                Icons.Default.LocalGasStation, "Range", "${car.value?.carRange}km",
+                                Icons.Default.LocalGasStation, "Range", "${car.value?.carRange?:""}km",
                                 modifier = Modifier.weight(1f)
                             )
                             InfoCard(
-                                Icons.Default.Speed, "Speed", "${car.value?.maxSpeed}/kph",
+                                Icons.Default.Speed, "Speed", "${car.value?.maxSpeed?:""}/kph",
                                 modifier = Modifier.weight(1f)
                             )
                             InfoCard(
-                                Icons.Default.Tune, "Gear", "${car.value?.gearType}",
+                                Icons.Default.Tune, "Gear", car.value?.gearType?:"",
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -145,11 +149,11 @@ fun CarDetailScreen(
                                 modifier = Modifier.weight(1f)
                             )
                             InfoCard(
-                                Icons.Default.EventSeat, "Capacity", "${car.value?.seatsNumber} seat",
+                                Icons.Default.EventSeat, "Capacity", "${car.value?.seatsNumber?:""} seat",
                                 modifier = Modifier.weight(1f)
                             )
                             InfoCard(
-                                Icons.Default.Shield, "Drive", "${car.value?.drive}",
+                                Icons.Default.Shield, "Drive", car.value?.drive?:"",
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -158,9 +162,20 @@ fun CarDetailScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text("Reviews", style = MaterialTheme.typography.titleMedium)
                 }
-
-                items(reviews.value) { review ->
-                    ReviewCard(review)
+                if (!isLoadingReview.value)
+                {
+                    items(reviews.value) { review ->
+                        ReviewCard(review)
+                    }
+                }
+                else{
+                    item{
+                        Box(modifier = Modifier.fillMaxWidth())
+                        {
+                            CircularProgressIndicator(color = Color(0xFF0D6EFD),
+                                modifier = Modifier.align(Alignment.Center))
+                        }
+                    }
                 }
             }
         }
@@ -172,25 +187,21 @@ fun CarDetailScreen(
                 text = "RENT NOW",
                 textColor = 0xFFFFFFFF,
                 onClickChange = {
-                    onContractNav(car.value?.rentalPrice?:0f,car.value?.id?:"")
+                    viewModel.checkStatus(onContractNav)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             )
         }
-
-        CustomButton(
-            backgroundColor = Color(0xFF0D6EFD),
-            text = "RENT NOW",
-            textColor = 0xFFFFFFFF,
-            onClickChange = {
-                onContractNav(car.value?.rentalPrice?:0f,car.value?.id?:"")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        )
+        isQualified.value?.let {
+            if (!it)
+            {
+                ErrorDialog (text = "You must complete your phone number and address") {
+                    viewModel.resetQualify()
+                }
+            }
+        }
     }
 }
 

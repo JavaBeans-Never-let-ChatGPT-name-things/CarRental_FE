@@ -77,4 +77,7 @@ class AccountRepositoryImpl (private val accountApi: AccountApi): AccountReposit
         extraDays: Int
     ): MessageResponse
             = accountApi.extendContract(contractId, extraDays)
+
+    override suspend fun checkStatus(): Response<Boolean>
+        = accountApi.isQualified()
 }

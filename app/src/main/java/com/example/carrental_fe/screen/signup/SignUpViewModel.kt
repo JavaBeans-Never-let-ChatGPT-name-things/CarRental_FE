@@ -10,6 +10,8 @@ import com.example.carrental_fe.CarRentalApplication
 import com.example.carrental_fe.data.AuthenticationRepository
 import com.example.carrental_fe.dto.request.RegisterRequest
 import com.example.carrental_fe.dto.response.MessageResponse
+import com.example.carrental_fe.utils.isValidEmail
+import com.example.carrental_fe.utils.isValidPassword
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -70,6 +72,21 @@ class SignUpViewModel (private val authenticationRepository: AuthenticationRepos
     }
     fun register()
     {
+        if (_username.value.isBlank() ||
+            _password.value.isBlank() ||
+            _email.value.isBlank() ||
+            _displayName.value.isBlank()) {
+            _signUpState.value = SignUpState.Error("All fields are required")
+            return
+        }
+        if (!_email.value.isValidEmail()) {
+            _signUpState.value = SignUpState.Error("Invalid email format")
+            return
+        }
+        if (!_password.value.isValidPassword()){
+            _signUpState.value = SignUpState.Error("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")
+            return
+        }
         viewModelScope.launch {
             _signUpState.value = SignUpState.Loading
             try {

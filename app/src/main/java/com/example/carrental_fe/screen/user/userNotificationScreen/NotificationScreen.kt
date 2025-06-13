@@ -78,7 +78,7 @@ fun NotificationScreen(
         .background(Color.White)
         .padding(16.dp)) {
         TopTitle("Notifications")
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Row(
                 modifier = Modifier
                 .fillMaxWidth()

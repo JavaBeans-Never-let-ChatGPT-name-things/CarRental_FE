@@ -15,6 +15,7 @@ import com.example.carrental_fe.dto.request.ResetPasswordRequest
 import com.example.carrental_fe.dto.response.MessageResponse
 import com.example.carrental_fe.nav.ResetPassword
 import com.example.carrental_fe.screen.verify.VerifyAccountViewModel
+import com.example.carrental_fe.utils.isValidPassword
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -42,6 +43,8 @@ class ResetPasswordViewModel(private val authenticationRepository: Authenticatio
     private val _resetPasswordState = MutableStateFlow<ResetPasswordState>(ResetPasswordState.Idle)
     val resetPasswordState: StateFlow<ResetPasswordState> = _resetPasswordState
 
+    private val _errorMessage = MutableStateFlow<String?>("")
+    val errorMessage: StateFlow<String?> = _errorMessage
 
     fun togglePasswordVisibility() {
         _isPasswordVisible.value = !_isPasswordVisible.value
@@ -57,6 +60,10 @@ class ResetPasswordViewModel(private val authenticationRepository: Authenticatio
     fun resetPassword() {
         viewModelScope.launch {
             try {
+                if (!_password.value.isValidPassword()){
+                    _errorMessage.value = "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character."
+                    return@launch
+                }
                 _resetPasswordState.value = ResetPasswordState.Loading
                 val response = authenticationRepository.reset(ResetPasswordRequest(
                     email = email.email?:"",

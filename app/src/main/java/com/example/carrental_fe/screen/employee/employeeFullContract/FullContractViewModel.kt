@@ -1,4 +1,4 @@
-package com.example.carrental_fe.screen.employee.emplooyeeFullContract
+package com.example.carrental_fe.screen.employee.employeeFullContract
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -20,6 +20,7 @@ class FullContractViewModel (private val employeeRepository: EmployeeRepository)
 
     private val _filterOptions = MutableStateFlow<List<String>>(emptyList())
     val filterOptions: StateFlow<List<String>> = _filterOptions
+
     private val _selectedFilter = MutableStateFlow("All User")
     val selectedFilter : StateFlow<String> = _selectedFilter
 
@@ -28,6 +29,7 @@ class FullContractViewModel (private val employeeRepository: EmployeeRepository)
 
     private val _filteredContracts = MutableStateFlow<List<Contract>>(emptyList())
     val filteredContracts : StateFlow<List<Contract>> = _filteredContracts
+
     init {
         getContracts()
         viewModelScope.launch {
@@ -38,6 +40,7 @@ class FullContractViewModel (private val employeeRepository: EmployeeRepository)
         viewModelScope.launch {
             try {
                 _contracts.value = employeeRepository.getEmployeeContracts()
+                _filterOptions.value = listOf("All User") + _contracts.value.map { it.customerName }.distinct()
             }
             catch(e: Exception){
                 e.printStackTrace()

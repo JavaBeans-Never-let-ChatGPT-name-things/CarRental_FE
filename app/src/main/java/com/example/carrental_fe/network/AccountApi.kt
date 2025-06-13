@@ -54,4 +54,7 @@ interface AccountApi {
         @Path("contractId") contractId: Long,
         @Path("extraDays") extraDays: Int
     ): MessageResponse
+
+    @GET("api/accounts/isQualified")
+    suspend fun isQualified(): Response<Boolean>
 }

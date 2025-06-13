@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carrental_fe.R
+import com.example.carrental_fe.dialog.SuccessDialog
 import com.example.carrental_fe.screen.user.userContractScreen.ContractCard
 import com.example.carrental_fe.screen.user.userHomeScreen.TopTitle
 
@@ -46,6 +47,7 @@ fun ConfirmContractScreen(vm: ConfirmContractViewModel = viewModel(factory = Con
     val filterOptions = vm.filterOptions.collectAsState().value
     val selectedFilter = vm.selectedFilter.collectAsState()
     val selectedSort = vm.selectedSort.collectAsState()
+    val message = vm.message.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -129,6 +131,11 @@ fun ConfirmContractScreen(vm: ConfirmContractViewModel = viewModel(factory = Con
                 onConfirmPending = { vm.confirmContract(contract.id) },
                         onRejectPending = { vm.rejectContract(contract.id) },
             )
+        }
+        message.value?.let{
+            SuccessDialog(text = message.value!!) {
+                vm.clearMessage()
+            }
         }
     }
 }

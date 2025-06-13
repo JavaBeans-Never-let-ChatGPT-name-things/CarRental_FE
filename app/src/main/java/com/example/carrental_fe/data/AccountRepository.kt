@@ -28,4 +28,5 @@ interface AccountRepository {
     suspend fun retryContract(contractId: Long): MessageResponse
     suspend fun reportLost(contractId: Long): MessageResponse
     suspend fun extendContract(contractId: Long, extraDays: Int): MessageResponse
+    suspend fun checkStatus(): Response<Boolean>
 }

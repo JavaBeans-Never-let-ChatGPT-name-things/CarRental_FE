@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.carrental_fe.R
-import com.example.carrental_fe.screen.employee.emplooyeeFullContract.FullContractScreen
+import com.example.carrental_fe.screen.employee.employeeFullContract.FullContractScreen
 import com.example.carrental_fe.screen.employee.employeeContractList.ConfirmContractScreen
 import com.example.carrental_fe.screen.user.userProfile.ProfileScreen
 

@@ -34,6 +34,7 @@ class CarManagementViewModel (private val carRepository: CarRepository,
 
     private val _selectedBrand = MutableStateFlow<CarBrand?>(null)
     val selectedBrand: StateFlow<CarBrand?> = _selectedBrand
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -42,6 +43,7 @@ class CarManagementViewModel (private val carRepository: CarRepository,
 
     private val _isLoadingBrand = MutableStateFlow(false)
     val isLoadingBrand: StateFlow<Boolean> = _isLoadingBrand
+
     init {
         loadCarBrands()
         loadCars()
@@ -62,11 +64,15 @@ class CarManagementViewModel (private val carRepository: CarRepository,
     {
         viewModelScope.launch {
             try {
-                adminRepository.addCarBrand(name, logo)
+                val result = adminRepository.addCarBrand(name, logo).message
+                if (result != "Car brand added successfully"){
+                    _error.value = result
+                }
                 loadCarBrands()
             }
             catch (e: Exception)
             {
+
                 _error.value = e.message ?: "Unknown error"
             }
         }
@@ -86,7 +92,7 @@ class CarManagementViewModel (private val carRepository: CarRepository,
     {
         viewModelScope.launch {
             try {
-                adminRepository.addCar(
+                val response = adminRepository.addCar(
                     id,
                     brandName,
                     maxSpeed,
@@ -97,7 +103,10 @@ class CarManagementViewModel (private val carRepository: CarRepository,
                     engineType,
                     gearType,
                     drive
-                )
+                ).message
+                if (response != "Successfully added car $id"){
+                    _error.value = response
+                }
                 loadCars()
             }
             catch (e: Exception)
